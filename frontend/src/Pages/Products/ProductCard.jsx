@@ -88,7 +88,7 @@ const ProductCard = ({ cardData }) => {
                             size="small"
                             sx={{
                                 position: 'absolute',
-                                top: 10,
+                                top: 20,
                                 left: 10,
                                 fontWeight: 'bold',
                                 backgroundColor: '#ff5252',
