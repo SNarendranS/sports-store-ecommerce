@@ -5,7 +5,7 @@ const authorizeMiddleware = require('../middlewares/authorize');
 const router = express.Router();
 
 // Update user details (protected)
-router.post('/update', updateUser);
+router.put('/update',authorizeMiddleware, updateUser);
 
 // Get user by username (protected)
 router.get('/email', authorizeMiddleware, getUser);

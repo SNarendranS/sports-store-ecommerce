@@ -4,10 +4,10 @@ const userAddressController = require('../controllers/userAddressController');
 const authorizeMiddleware = require('../middlewares/authorize');
 
 // POST /api/addresses → create new address
-router.post('/', authorizeMiddleware, userAddressController.createAddress);
+router.post('/',authorizeMiddleware, userAddressController.createAddress);
 
 // GET /api/addresses/user/:userid → get all addresses for a user
-router.get('/user/:userid', authorizeMiddleware, userAddressController.getUserAddresses);
+router.get('/', authorizeMiddleware, userAddressController.getUserAddresses);
 
 // GET /api/addresses/:addressid → get specific address
 router.get('/:addressid', authorizeMiddleware, userAddressController.getAddressById);

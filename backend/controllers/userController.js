@@ -37,20 +37,45 @@ const getUserById = async (req, res) => {
 
 // Update user details
 const updateUser = async (req, res) => {
-  const { userDetail, updateDetail } = req.body;
-
   try {
-    // Find the user first
-    const user = await User.findOne({ where: userDetail });
+    const { userid } = req.user
+    const { updateDetail } = req.body;
 
-    if (!user) return res.status(400).json({ message: 'Cannot update — user does not exist' });
+    if (!updateDetail) {
+      return res.status(400).json({ message: 'Missing user detail or update detail.' });
+    }
 
-    // Update user
+    // Find user by provided filter (preferably { id } or { email })
+    const user = await User.findOne({ where: userid });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Prevent sensitive field updates
+    const restrictedFields = ['password', 'role', 'id', 'createdAt', 'updatedAt'];
+    for (const field of restrictedFields) {
+      if (updateDetail.hasOwnProperty(field)) {
+        delete updateDetail[field];
+      }
+    }
+
+    // Perform update
     await user.update(updateDetail);
 
-    res.status(200).json({ message: 'User updated successfully' });
+    // Fetch updated data (clean response)
+    const updatedUser = await User.findOne({
+      where: userid,
+      attributes: { exclude: ['password'] },
+    });
+
+    return res.status(200).json({
+      message: 'User updated successfully',
+      user: updatedUser,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error updating user:', error);
+    return res.status(500).json({ message: error.message });
   }
 };
 

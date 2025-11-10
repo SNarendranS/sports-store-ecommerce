@@ -8,9 +8,12 @@ const UserRoute = require('./routes/userRoute.js')
 const ProductRoute = require('./routes/productRoute.js')
 const CartRoute = require('./routes/cartRoute.js')
 const favRoute = require('./routes/favRoute.js')
+const addressRoute = require('./routes/userAddressRoute.js')
+const profileRoute = require('./routes/userProfileRoute.js')
 const app = express()
 
 app.use(express.json())
+//cross origin resource sharing
 app.use(cors())
 
 app.use('/auth', AuthRoute)
@@ -18,6 +21,8 @@ app.use('/user', UserRoute)
 app.use('/product', ProductRoute)
 app.use('/cart', CartRoute)
 app.use('/fav', favRoute)
+app.use('/address', addressRoute)
+app.use('/profile', profileRoute)
 
 const start = async () => {
     try {

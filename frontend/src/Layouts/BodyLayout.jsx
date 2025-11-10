@@ -4,7 +4,7 @@ import Login from '../Pages/Login'
 import Products from '../Pages/Products/Products'
 import ProductDetails from '../Pages/Products/ProductDetails'
 import Cart from '../Pages/Cart'
-import Profile from '../Pages/Profile'
+import Profile from '../Pages/Profile/Profile' 
 
 const BodyLayout = ({ searchText }) => {
   return (

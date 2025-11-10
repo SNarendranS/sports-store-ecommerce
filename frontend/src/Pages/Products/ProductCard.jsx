@@ -17,10 +17,12 @@ import ProductDetails from './ProductDetails';
 import useProductActions from '../../Hooks/useProductActions';
 import cartService from '../../Services/cartService';
 import QuantityPopup from './QuantityPopup';
+import ItemAdded from './ItemAdded';
 
 const ProductCard = ({ cardData }) => {
     const [open, setOpen] = useState(false);
     const [openQ, setOpenQ] = useState(false);
+    const [openI, setOpenI] = useState(false);
 
     const { isInCart, isFavorite, toggleCart, toggleFavorite } = useProductActions();
     const inCart = isInCart(cardData.productid);
@@ -38,13 +40,17 @@ const ProductCard = ({ cardData }) => {
                 setCartQuantity(res.quantity || 1);
                 setOpenQ(true);
             } else {
-                // This case is redundant since fetch will throw on 404, but kept for safety
+                console.log("new item added")
+                setOpenI(true);
                 toggleCart(cardData.productid);
                 window.dispatchEvent(new CustomEvent('cartToggled', { detail: cardData.productid }));
+
             }
         } catch (error) {
             if (error.response?.status === 404) {
                 // Item not found → add to cart & trigger refresh
+                                setOpenI(true);
+
                 toggleCart(cardData.productid);
                 window.dispatchEvent(new CustomEvent('cartToggled', { detail: cardData.productid }));
             } else {
@@ -176,6 +182,14 @@ const ProductCard = ({ cardData }) => {
                         product={cardData}
                         initialQuantity={cartQuantity}
                         handleClose={() => setOpenQ(false)}
+                    />
+                </DialogContent>
+            </Dialog>
+            {/* item Added Popup Modal */}
+            <Dialog open={openI} onClose={() => setOpenI(false)} fullWidth maxWidth="sm">
+                <DialogContent>
+                    <ItemAdded
+                        handleClose={() => setOpenI(false)}
                     />
                 </DialogContent>
             </Dialog>

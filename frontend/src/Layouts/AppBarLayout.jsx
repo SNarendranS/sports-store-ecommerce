@@ -41,7 +41,7 @@ export const AppBarLayout = () => {
       <AppBar
         position="fixed"
         sx={{
-          background: 'linear-gradient(90deg, #0d47a1, #1976d2)',
+          background: 'linear-gradient(90deg, #0d47a1, #0b7becff)',
           boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
         }}
       >

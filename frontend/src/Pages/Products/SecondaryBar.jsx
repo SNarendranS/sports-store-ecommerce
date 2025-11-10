@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingCart, Favorite, Search } from '@mui/icons-material';
+import { ShoppingCart, Favorite, Search, Close } from '@mui/icons-material';
 import {
-    AppBar, Toolbar, Badge, Box, IconButton,
-    TextField, InputAdornment, FormControl, MenuItem, Select, InputLabel
+    AppBar,
+    Toolbar,
+    Badge,
+    Box,
+    IconButton,
+    TextField,
+    InputAdornment,
+    FormControl,
+    MenuItem,
+    Select,
+    InputLabel,
+    useMediaQuery,
+    Paper,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,107 +28,176 @@ const SecondaryBar = () => {
     const [categories, setCategories] = useState([]);
     const dispatch = useDispatch();
     const searchText = useSelector((state) => state.search.searchText);
-    const categoryValue = useSelector((state) => state.category.value); // ✅ moved here
+    const categoryValue = useSelector((state) => state.category.value);
 
     const navigate = useNavigate();
+    const isMobile = useMediaQuery('(max-width:768px)');
 
-    // 🛒 Fetch cart
     const fetchCart = async () => {
         const res = await cartService.getUserCart();
         if (res) setCartItems(res);
     };
 
-    const fetchFavorites = async () => {
-        setFavItems([]);
-    };
+    const fetchFavorites = async () => setFavItems([]);
 
-    // 🏷️ Fetch categories
     const fetchCategories = async () => {
         const res = await ProductService.getAllProductsCategories();
-        if (Array.isArray(res?.data)) setCategories(["all", ...res?.data]);
-        else setCategories([]); // safety
+        if (Array.isArray(res?.data)) setCategories(['All', ...res?.data]);
+        else setCategories([]);
     };
 
-    // 📦 Load cart & favorites
     useEffect(() => {
-        const loadCart = async () => await fetchCart();
-        const loadFav = async () => await fetchFavorites();
+        fetchCart();
+        fetchFavorites();
+        fetchCategories();
 
-        loadCart();
-        loadFav();
+        const updateCart = async () => await fetchCart();
+        const updateFav = async () => await fetchFavorites();
 
-        window.addEventListener("cartToggled", loadCart);
-        window.addEventListener("favToggled", loadFav);
+        window.addEventListener('cartToggled', updateCart);
+        window.addEventListener('favToggled', updateFav);
 
         return () => {
-            window.removeEventListener("cartToggled", loadCart);
-            window.removeEventListener("favToggled", loadFav);
+            window.removeEventListener('cartToggled', updateCart);
+            window.removeEventListener('favToggled', updateFav);
         };
     }, []);
 
-    // 🏷️ Load categories
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
     const handleSearchChange = (e) => dispatch(setSearchText(e.target.value));
-    const handleCategoryChange = (e) => dispatch(setCategoryValue(e.target.value))
+    const handleCategoryChange = (e) => dispatch(setCategoryValue(e.target.value));
 
-    const quantityLength = () =>
-        cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const quantityLength = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
-        <AppBar position="fixed" sx={{ backgroundColor: '#fff', color: '#333', mt: 8, height: 70 }}>
-            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                {/* 🔍 Search bar */}
-                <TextField
-                    size="small"
-                    placeholder="Search for products..."
-                    value={searchText}
-                    onChange={handleSearchChange}
-                    variant="outlined"
-                    sx={{ width: '40%', backgroundColor: '#f5f5f5', borderRadius: 2 }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Search />
-                            </InputAdornment>
-                        ),
+        <AppBar
+            position="fixed"
+            sx={{
+                backgroundColor: '#fff',
+                color: '#333',
+                mt: 8,
+                height: 70,
+                boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+                borderBottom: '1px solid #e0e0e0',
+                justifyContent: 'center',
+            }}
+        >
+            <Toolbar
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    flexWrap: isMobile ? 'wrap' : 'nowrap',
+                    gap: 2,
+                    px: isMobile ? 2 : 4,
+                    alignItems: 'center',
+                }}
+            >
+                {/* 🔍 Search + Category Wrapper */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        display: 'flex',
+                        width: isMobile ? '100%' : '45%',
+                        borderRadius: 3,
+                        backgroundColor: '#f5f5f5',
                     }}
-                />
+                >
+                    {/* Search Input */}
+                    <TextField
+                        size="small"
+                        placeholder="Search products..."
+                        value={searchText}
+                        onChange={handleSearchChange}
+                        variant="outlined"
+                        fullWidth
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: 0,
+                                borderRight: '1px solid #ccc',
+                                '&:hover fieldset': {
+                                    borderColor: '#1976d2',
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: '#1976d2',
+                                },
+                            },
+                        }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search sx={{ color: '#888' }} />
+                                </InputAdornment>
+                            ),
+                            endAdornment: searchText && (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        size="medium"
+                                        onClick={() => dispatch(setSearchText(''))}
+                                        sx={{ color: '#888', '&:hover': { color: '#000' } }}
+                                    >
+                                        <Close fontSize="small" />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                            sx: { paddingRight: 0 },
+                        }}
+                    />
 
-                {/* 🏷️ Category dropdown */}
-                <FormControl sx={{ width: '200px' }}>
-                    <InputLabel id="category-select-label">Category</InputLabel>
-                    <Select
-                        labelId="category-select-label"
-                        id="category-select"
-                        label="Category"
-                        value={categoryValue} // ✅ prevents "undefined" warning
-                        onChange={handleCategoryChange}
-                    >
-                        {Array.isArray(categories) && categories.length > 0 ? (
-                            categories.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))
-                        ) : (
-                            <MenuItem disabled>No categories</MenuItem>
-                        )}
-                    </Select>
-                </FormControl>
+
+
+                    {/* Category Select */}
+                    <FormControl size="small" sx={{ minWidth: 140, borderRadius: 0 }}>
+                        <Select
+                            value={categoryValue || 'All'}
+                            onChange={handleCategoryChange}
+                            displayEmpty
+                            sx={{
+                                borderRadius: 0,
+                                height: '100%',
+                                '& .MuiSelect-select': { py: 1 },
+                            }}
+                        >
+                            {Array.isArray(categories) && categories.length > 0 ? (
+                                categories.map((category) => (
+                                    <MenuItem key={category} value={category}>
+                                        {category}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>No categories</MenuItem>
+                            )}
+                        </Select>
+                    </FormControl>
+                </Paper>
 
                 {/* ❤️ + 🛒 icons */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Badge badgeContent={favItems.length} color="error">
-                        <IconButton>
+                        <IconButton
+                            sx={{
+                                '&:hover': {
+                                    color: '#ff4081',
+                                    transform: 'scale(1.1)',
+                                    backgroundColor: 'rgba(255,64,129,0.1)',
+                                },
+                                transition: '0.3s all',
+                            }}
+                        >
                             <Favorite />
                         </IconButton>
                     </Badge>
 
                     <Badge badgeContent={quantityLength()} color="primary">
-                        <IconButton onClick={() => navigate('/cart')}>
+                        <IconButton
+                            onClick={() => navigate('/cart')}
+                            sx={{
+                                '&:hover': {
+                                    color: '#1976d2',
+                                    transform: 'scale(1.1)',
+                                    backgroundColor: 'rgba(25,118,210,0.1)',
+                                },
+                                transition: '0.3s all',
+                            }}
+                        >
                             <ShoppingCart />
                         </IconButton>
                     </Badge>

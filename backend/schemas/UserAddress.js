@@ -17,6 +17,10 @@ const UserAddress = sequelize.define('UserAddress', {
     },
     onDelete: 'CASCADE',
   },
+  tag: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   addressLine1: {
     type: DataTypes.STRING,
     allowNull: false,

@@ -28,7 +28,7 @@ const Products = ({ offers }) => {
         item =>
             (item.name.toLowerCase().includes(searchText.toLowerCase()) ||
                 item.price.toString().toLowerCase().includes(searchText.toLowerCase())) &&
-            (!categoryValue || item.category.toLowerCase() === categoryValue.toLowerCase())
+            (!categoryValue ||categoryValue.toLowerCase() ==='all'|| item.category.toLowerCase() === categoryValue.toLowerCase())
     );
 
 
@@ -45,11 +45,11 @@ const Products = ({ offers }) => {
 
             <Grid container gap={2} sx={{ margin: 2, justifyContent: 'center' }}>
                 {console.log(categoryValue)}
-                {filteredData.map((element, index) => (
+                {filteredData.length > 0 ? filteredData.map((element, index) => (
                     <Grid key={index}>
                         <ProductCard cardData={element} />
                     </Grid>
-                ))}
+                )):'No Match Found'}
             </Grid>
         </>
     );

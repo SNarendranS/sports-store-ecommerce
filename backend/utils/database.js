@@ -12,7 +12,7 @@ const database = async () => {
     console.log('✅ PostgreSQL connected successfully');
 
     // Sync models with DB
-  // await sequelize.sync({ aflter: true }); // <-- This will create missing tables or alter columns if needed
+  //await sequelize.sync({ aflter: true }); // <-- This will create missing tables or alter columns if needed
 
   } catch (err) {
     console.error('❌ PostgreSQL connection error:', err.message);

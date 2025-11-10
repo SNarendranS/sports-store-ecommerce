@@ -1,10 +1,11 @@
-const UserAddress = require('../models/UserAddress');
-const User = require('../models/User');
+const UserAddress = require('../schemas/UserAddress');
+const User = require('../schemas/User');
 
 // ✅ Create a new address
 exports.createAddress = async (req, res) => {
   try {
-    const { userid, addressLine1, addressLine2, addressLine3, city, state, pincode } = req.body;
+    const { userid } = req.user
+    const { addressLine1, addressLine2, addressLine3, city, state, pincode, tag } = req.body;
 
     if (!userid || !addressLine1 || !city || !state || !pincode) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -17,6 +18,7 @@ exports.createAddress = async (req, res) => {
 
     const newAddress = await UserAddress.create({
       userid,
+      tag,
       addressLine1,
       addressLine2,
       addressLine3,
@@ -35,7 +37,7 @@ exports.createAddress = async (req, res) => {
 // 📜 Get all addresses for a specific user
 exports.getUserAddresses = async (req, res) => {
   try {
-    const { userid } = req.params;
+    const { userid } = req.user;
 
     const addresses = await UserAddress.findAll({
       where: { userid },
