@@ -4,8 +4,9 @@ const User = require('../schemas/User');
 // ✅ Create a new address
 exports.createAddress = async (req, res) => {
   try {
+    console.log("addressccreate",req.body)
     const { userid } = req.user
-    const { addressLine1, addressLine2, addressLine3, city, state, pincode, tag } = req.body;
+    const { addressLine1, addressLine2, addressLine3, city, state, pincode, tag } = req.body.addressDetail;
 
     if (!userid || !addressLine1 || !city || !state || !pincode) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -72,7 +73,8 @@ exports.getAddressById = async (req, res) => {
 exports.updateAddress = async (req, res) => {
   try {
     const { addressid } = req.params;
-    const updated = await UserAddress.update(req.body, {
+    console.log("address",req.body)
+    const updated = await UserAddress.update(req.body.updateDetail, {
       where: { addressid },
     });
 

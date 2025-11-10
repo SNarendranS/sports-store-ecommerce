@@ -13,7 +13,7 @@ router.get('/', authorizeMiddleware, userAddressController.getUserAddresses);
 router.get('/:addressid', authorizeMiddleware, userAddressController.getAddressById);
 
 // PUT /api/addresses/:addressid → update specific address
-router.put('/:addressid', authorizeMiddleware, userAddressController.updateAddress);
+router.put('/update/:addressid', authorizeMiddleware, userAddressController.updateAddress);
 
 // DELETE /api/addresses/:addressid → delete specific address
 router.delete('/:addressid', authorizeMiddleware, userAddressController.deleteAddress);

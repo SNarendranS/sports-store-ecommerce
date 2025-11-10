@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -8,77 +8,82 @@ import {
   Button,
   CircularProgress,
 } from '@mui/material'
+import { Formik, Form, Field } from 'formik'
+import * as Yup from 'yup'
 import UserAddressService from '../../Services/userAddressService'
+
+const addressSchema = Yup.object().shape({
+  tag: Yup.string().required('Tag is required'),
+  addressLine1: Yup.string().required('Address Line 1 is required'),
+  city: Yup.string().required('City is required'),
+  state: Yup.string().required('State is required'),
+  pincode: Yup.string().required('Pincode is required'),
+})
 
 const EmailPopup = ({ openState, onClose, onSuccess }) => {
   const { open, mode, data } = openState
-  const [formData, setFormData] = useState({
-    tag: '',
-    addressLine1: '',
-    addressLine2: '',
-    addressLine3: '',
-    city: '',
-    state: '',
-    pincode: '',
-  })
-  const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    if (mode === 'edit' && data) {
-      setFormData(data)
-    } else {
-      setFormData({
-        tag: '',
-        addressLine1: '',
-        addressLine2: '',
-        addressLine3: '',
-        city: '',
-        state: '',
-        pincode: '',
-      })
-    }
-  }, [mode, data])
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const initialValues = {
+    tag: data?.tag || '',
+    addressLine1: data?.addressLine1 || '',
+    addressLine2: data?.addressLine2 || '',
+    addressLine3: data?.addressLine3 || '',
+    city: data?.city || '',
+    state: data?.state || '',
+    pincode: data?.pincode || '',
   }
 
-  const handleSave = async () => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      setSaving(true)
       if (mode === 'edit') {
-        await UserAddressService.updateAddress(data.id, formData)
+        await UserAddressService.updateAddress(data.addressid, values)
       } else {
-        await UserAddressService.createAddress(formData)
+        await UserAddressService.createAddress(values)
       }
-      onSuccess() // Refresh profile data in parent
+      onSuccess()
       onClose()
     } catch (error) {
       console.error('Error saving address:', error)
     } finally {
-      setSaving(false)
+      setSubmitting(false)
     }
   }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>{mode === 'edit' ? 'Edit Address' : 'Add New Address'}</DialogTitle>
-      <DialogContent>
-        <TextField label="Tag" name="tag" fullWidth margin="dense" value={formData.tag} onChange={handleChange} />
-        <TextField label="Address Line 1" name="addressLine1" fullWidth margin="dense" value={formData.addressLine1} onChange={handleChange} />
-        <TextField label="Address Line 2" name="addressLine2" fullWidth margin="dense" value={formData.addressLine2} onChange={handleChange} />
-        <TextField label="Address Line 3" name="addressLine3" fullWidth margin="dense" value={formData.addressLine3} onChange={handleChange} />
-        <TextField label="City" name="city" fullWidth margin="dense" value={formData.city} onChange={handleChange} />
-        <TextField label="State" name="state" fullWidth margin="dense" value={formData.state} onChange={handleChange} />
-        <TextField label="Pincode" name="pincode" fullWidth margin="dense" value={formData.pincode} onChange={handleChange} />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={saving}>Cancel</Button>
-        <Button onClick={handleSave} variant="contained" color="primary" disabled={saving}>
-          {saving ? <CircularProgress size={18} /> : 'Save'}
-        </Button>
-      </DialogActions>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={addressSchema}
+        onSubmit={handleSubmit}
+        enableReinitialize
+      >
+        {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
+          <Form>
+            <DialogContent>
+              {['tag', 'addressLine1', 'addressLine2', 'addressLine3', 'city', 'state', 'pincode'].map((field) => (
+                <TextField
+                  key={field}
+                  label={field.charAt(0).toUpperCase() + field.slice(1)}
+                  name={field}
+                  fullWidth
+                  margin="dense"
+                  value={values[field]}
+                  onChange={handleChange}
+                  error={touched[field] && Boolean(errors[field])}
+                  helperText={touched[field] && errors[field]}
+                />
+              ))}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={onClose} disabled={isSubmitting}>Cancel</Button>
+              <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+                {isSubmitting ? <CircularProgress size={18} /> : 'Save'}
+              </Button>
+            </DialogActions>
+          </Form>
+        )}
+      </Formik>
     </Dialog>
   )
 }

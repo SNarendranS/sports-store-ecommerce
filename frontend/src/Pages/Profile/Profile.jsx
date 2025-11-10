@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import UserService from '../../Services/userService'
+import EmailCard from './EmailCard'
+import EmailPopup from './EmailPopup'
 import {
   Container,
   Grid,
@@ -19,25 +21,20 @@ import {
   TextField,
   CircularProgress,
 } from '@mui/material'
-import {Edit,Add} from '@mui/icons-material'
-import EmailCard from './EmailCard'
-import EmailPopup from './EmailPopup'
+import { Edit, Add } from '@mui/icons-material'
 
 const Profile = () => {
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openEdit, setOpenEdit] = useState(false)
-  const [formData, setFormData] = useState({
-    name: '',
-    phoneNumber: '',
-  })
+  const [formData, setFormData] = useState({ name: '', phoneNumber: '' })
   const [saving, setSaving] = useState(false)
-
-const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: '', data: null })
+  const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: '', data: null })
 
   // Fetch profile info
   const fetchProfileData = async () => {
     try {
+      setLoading(true)
       const res = await UserService.getUserProfile()
       if (res) {
         setUserData(res)
@@ -55,7 +52,7 @@ const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: ''
 
   useEffect(() => {
     fetchProfileData()
-  }, [saving])
+  }, [])
 
   // Handle input changes
   const handleChange = (e) => {
@@ -91,7 +88,6 @@ const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: ''
               ? 'linear-gradient(145deg, #1e1e1e, #2c2c2c)'
               : 'linear-gradient(145deg, #ffffff, #f3f4f6)',
           boxShadow: 6,
-          position: 'relative',
         }}
       >
         {/* Header Section */}
@@ -108,12 +104,7 @@ const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: ''
             <Skeleton variant="circular" width={80} height={80} />
           ) : (
             <Avatar
-              sx={{
-                width: 90,
-                height: 90,
-                bgcolor: 'primary.main',
-                fontSize: 36,
-              }}
+              sx={{ width: 90, height: 90, bgcolor: 'primary.main', fontSize: 36 }}
             >
               {userData?.name?.charAt(0)?.toUpperCase()}
             </Avatar>
@@ -143,11 +134,7 @@ const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: ''
 
           {!loading && (
             <Tooltip title="Edit Profile">
-              <IconButton
-                color="primary"
-                sx={{ alignSelf: 'flex-start' }}
-                onClick={() => setOpenEdit(true)}
-              >
+              <IconButton color="primary" onClick={() => setOpenEdit(true)}>
                 <Edit />
               </IconButton>
             </Tooltip>
@@ -160,7 +147,6 @@ const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: ''
         <Typography variant="h6" gutterBottom fontWeight={600}>
           Addresses
         </Typography>
-
         <Grid container spacing={3}>
           {loading
             ? Array.from(new Array(2)).map((_, i) => (
@@ -173,21 +159,28 @@ const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: ''
                 </Grid>
               ))
             : userData?.UserAddresses?.map((address, index) => (
-                <EmailCard key={index} address={address} />
+                <EmailCard
+                  key={index}
+                  address={address}
+                  onEdit={(addr) =>
+                    setOpenAddressPopup({ open: true, mode: 'edit', data: addr })
+                  }
+                  onDelete={fetchProfileData}
+                />
               ))}
         </Grid>
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-  <Tooltip title="Add New Address">
-    <IconButton
-      color="primary"
-      size="large"
-      onClick={() => setOpenAddressPopup({ open: true, mode: 'add', data: null })}
-    >
-      <Add />
-    </IconButton>
-  </Tooltip>
-</Box>
 
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+          <Tooltip title="Add New Address">
+            <IconButton
+              color="primary"
+              size="large"
+              onClick={() => setOpenAddressPopup({ open: true, mode: 'add', data: null })}
+            >
+              <Add />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Paper>
 
       {/* Edit Profile Dialog */}
@@ -227,6 +220,12 @@ const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: ''
           </Button>
         </DialogActions>
       </Dialog>
+
+      <EmailPopup
+        openState={openAddressPopup}
+        onClose={() => setOpenAddressPopup({ open: false, mode: '', data: null })}
+        onSuccess={fetchProfileData}
+      />
     </Container>
   )
 }
