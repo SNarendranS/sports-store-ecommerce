@@ -2,9 +2,8 @@ const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(process.env.PG_URL, {
   dialect: 'postgres',
-  logging: false, // disable SQL logs
+  logging: false,
 });
-
 
 const database = async () => {
   try {
@@ -12,7 +11,7 @@ const database = async () => {
     console.log('✅ PostgreSQL connected successfully');
 
     // Sync models with DB
-  //await sequelize.sync({ aflter: true }); // <-- This will create missing tables or alter columns if needed
+    //await sequelize.sync({ aflter: true }); 
 
   } catch (err) {
     console.error('❌ PostgreSQL connection error:', err.message);

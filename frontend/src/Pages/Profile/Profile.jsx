@@ -19,9 +19,10 @@ import {
   DialogActions,
   Button,
   TextField,
-  CircularProgress,
+  CircularProgress,Stack
 } from '@mui/material'
 import { Edit, Add } from '@mui/icons-material'
+import { useNavigate } from 'react-router-dom'
 
 const Profile = () => {
   const [userData, setUserData] = useState(null)
@@ -30,7 +31,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({ name: '', phoneNumber: '' })
   const [saving, setSaving] = useState(false)
   const [openAddressPopup, setOpenAddressPopup] = useState({ open: false, mode: '', data: null })
-
+  const navigate = useNavigate()
   // Fetch profile info
   const fetchProfileData = async () => {
     try {
@@ -74,6 +75,42 @@ const Profile = () => {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (!userData && !loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '10vh', // centers vertically
+          px: 2,
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            textAlign: 'center',
+            background: (theme) =>
+              theme.palette.mode === 'dark'
+                ? '#2c2c2c'
+                : '#f5f5f5',
+          }}
+        >
+          <Stack spacing={2} alignItems="center">
+            <Typography variant="h6">
+              Please login to view your profile
+            </Typography>
+            <Button variant="contained" color="primary" onClick={() => navigate("/")}>
+              Login
+            </Button>
+          </Stack>
+        </Paper>
+      </Box>
+    );
   }
 
   return (
@@ -150,24 +187,24 @@ const Profile = () => {
         <Grid container spacing={3}>
           {loading
             ? Array.from(new Array(2)).map((_, i) => (
-                <Grid item xs={12} sm={6} key={i}>
-                  <Skeleton
-                    variant="rectangular"
-                    height={120}
-                    sx={{ borderRadius: 2 }}
-                  />
-                </Grid>
-              ))
-            : userData?.UserAddresses?.map((address, index) => (
-                <EmailCard
-                  key={index}
-                  address={address}
-                  onEdit={(addr) =>
-                    setOpenAddressPopup({ open: true, mode: 'edit', data: addr })
-                  }
-                  onDelete={fetchProfileData}
+              <Grid item xs={12} sm={6} key={i}>
+                <Skeleton
+                  variant="rectangular"
+                  height={120}
+                  sx={{ borderRadius: 2 }}
                 />
-              ))}
+              </Grid>
+            ))
+            : userData?.UserAddresses?.map((address, index) => (
+              <EmailCard
+                key={index}
+                address={address}
+                onEdit={(addr) =>
+                  setOpenAddressPopup({ open: true, mode: 'edit', data: addr })
+                }
+                onDelete={fetchProfileData}
+              />
+            ))}
         </Grid>
 
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
