@@ -1,9 +1,9 @@
-const Cart = require('../schemas/Cart');
-const Product = require('../schemas/Product');
-const User = require('../schemas/User');
+import Cart from '../schemas/Cart.js';
+import Product from '../schemas/Product.js';
+import User from '../schemas/User.js';
 
 // Add item to cart
-exports.addToCart = async (req, res) => {
+export const addToCart = async (req, res) => {
   try {
     const { userid } = req.user
     const { productid, quantity } = req.body;
@@ -27,7 +27,7 @@ exports.addToCart = async (req, res) => {
 };
 
 // Get all items in a user's cart
-exports.getUserCart = async (req, res) => {
+export const getUserCart = async (req, res) => {
   try {
     const { userid } = req.user;
 
@@ -48,7 +48,7 @@ exports.getUserCart = async (req, res) => {
 
 
 // Update quantity of a cart item
-exports.updateCartItem = async (req, res) => {
+export const updateCartItem = async (req, res) => {
   try {
     const { userid } = req.user;
     const { productid, quantity } = req.body;
@@ -67,7 +67,7 @@ exports.updateCartItem = async (req, res) => {
 };
 
 // Remove item from cart
-exports.removeFromCart = async (req, res) => {
+export const removeFromCart = async (req, res) => {
   try {
     const { userid } = req.user;
     const { productid } = req.body;
@@ -83,10 +83,10 @@ exports.removeFromCart = async (req, res) => {
   }
 };
 
-exports.findItemCart = async (req, res) => {
+export const findItemCart = async (req, res) => {
   try {
     const { userid } = req.user;
-    const { productid } = req.query; 
+    const { productid } = req.params; 
     const cartItem = await Cart.findOne({
       where: { userid, productid }
 

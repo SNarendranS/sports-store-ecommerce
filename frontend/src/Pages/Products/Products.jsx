@@ -38,6 +38,7 @@ const Products = ({ offers }) => {
         item.price.toString().toLowerCase().includes(searchText.toLowerCase())) &&
       (!categoryValue ||
         categoryValue.toLowerCase() === 'all' ||
+        categoryValue.toLowerCase() === ""||
         item.category.toLowerCase() === categoryValue.toLowerCase())
   );
 

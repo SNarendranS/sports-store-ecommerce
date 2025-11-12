@@ -1,6 +1,6 @@
-const Product = require('../schemas/Product');
-const { Op } = require('sequelize');
-const { Sequelize } = require('sequelize');
+import Product from '../schemas/Product.js';
+import { Op } from 'sequelize';
+import { Sequelize } from 'sequelize';
 
 // Create a new product
 const createProduct = async (req, res) => {
@@ -121,7 +121,7 @@ const getAllOfferProducts = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-module.exports = {
+export  {
     createProduct,
     getAllProducts,
     getProductById,

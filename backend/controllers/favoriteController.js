@@ -1,7 +1,7 @@
-const Favorite = require('../schemas/Favorite');
+import Favorite from '../schemas/Favorite.js';
 
 // Add item to favorites
-exports.addToFav = async (req, res) => {
+const addToFav = async (req, res) => {
   try {
     const { userid } = req.user;
     const { productid } = req.body;
@@ -24,7 +24,7 @@ exports.addToFav = async (req, res) => {
 };
 
 // Get all favorite items for a user
-exports.getUserFav = async (req, res) => {
+const getUserFav = async (req, res) => {
   try {
     const { userid } = req.user;
 
@@ -42,7 +42,7 @@ exports.getUserFav = async (req, res) => {
 };
 
 // Remove item from favorites
-exports.removeFromFav = async (req, res) => {
+const removeFromFav = async (req, res) => {
   try {
     const { userid } = req.user;
     const { productid } = req.body;
@@ -59,3 +59,5 @@ exports.removeFromFav = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export { addToFav, getUserFav, removeFromFav }

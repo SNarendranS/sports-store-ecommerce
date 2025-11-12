@@ -1,5 +1,5 @@
-const User = require('../schemas/User');
-const UserAddress = require('../schemas/UserAddress');
+import User from '../schemas/User.js';
+import UserAddress from '../schemas/UserAddress.js';
 
 const getUserProfile = async (req, res) => {
     const userEmail = req.user.email;
@@ -24,6 +24,6 @@ const getUserProfile = async (req, res) => {
     }
 };
 
-module.exports = {
-    getUserProfile,
+export {
+    getUserProfile
 };

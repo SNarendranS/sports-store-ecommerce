@@ -26,7 +26,7 @@ const getUserCart = async () => {
 
 const FindItemInCart = async (productId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/user/find?productid=${productId}`, { headers: getAuthHeaders() });
+    const response = await axios.get(`${API_BASE_URL}/user/find/${productId}`, { headers: getAuthHeaders() });
     return response.data;
   } catch (error) {
     console.error('Error fetching item cart:', error.response?.data || error.message);
@@ -34,9 +34,9 @@ const FindItemInCart = async (productId) => {
   }
 };
 
-const updateCartItem = async (productid,quantity) => {
+const updateCartItem = async (productid, quantity) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/update`, {productid, quantity }, { headers: getAuthHeaders() });
+    const response = await axios.put(`${API_BASE_URL}/update`, { productid, quantity }, { headers: getAuthHeaders() });
     return response.data;
   } catch (error) {
     console.error('Error updating cart item:', error.response?.data || error.message);

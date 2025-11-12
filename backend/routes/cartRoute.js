@@ -1,21 +1,21 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const cartController = require('../controllers/cartController');
-const authorize = require('../middlewares/authorize');
+import {addToCart,removeFromCart,getUserCart,updateCartItem,findItemCart} from '../controllers/cartController.js';
+import authorize  from '../middlewares/authorize.js';
 
 // Add item to cart
-router.post('/add',authorize, cartController.addToCart);
+router.post('/add',authorize, addToCart);
 
 // Get all items for a user
-router.get('/user/',authorize, cartController.getUserCart);
+router.get('/user/',authorize, getUserCart);
 
 // Update quantity
-router.put('/update',authorize, cartController.updateCartItem);
+router.put('/update',authorize, updateCartItem);
 
 // Remove item
-router.delete('/remove',authorize, cartController.removeFromCart);
+router.delete('/remove',authorize, removeFromCart);
 
 
-router.get('/user/find',authorize, cartController.findItemCart);
+router.get('/user/find/:productid',authorize, findItemCart);
 
-module.exports = router;
+export default router;

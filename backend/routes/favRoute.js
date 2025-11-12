@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const favoriteController = require('../controllers/favoriteController');
-const authorize = require('../middlewares/authorize');
+import {addToFav,removeFromFav,getUserFav} from '../controllers/favoriteController.js';
+import authorize from '../middlewares/authorize.js';
 
 // Add item to cart
-router.post('/add',authorize, favoriteController.addToFav);
+router.post('/add', authorize, addToFav);
 
 // Get all items for a user
-router.get('/user/',authorize, favoriteController.getUserFav)
+router.get('/user/', authorize, getUserFav)
 
 // Remove item
-router.delete('/remove',authorize, favoriteController.removeFromFav);
+router.delete('/remove', authorize, removeFromFav);
 
-module.exports = router;
+export default router;

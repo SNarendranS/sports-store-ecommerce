@@ -1,15 +1,15 @@
-const express = require('express')
-const cors = require('cors')
-require('dotenv').config()
+import express from 'express'
+import cors from 'cors'
 
-const { database } = require("./utils/database")
-const AuthRoute = require('./routes/authRoute.js')
-const UserRoute = require('./routes/userRoute.js')
-const ProductRoute = require('./routes/productRoute.js')
-const CartRoute = require('./routes/cartRoute.js')
-const favRoute = require('./routes/favRoute.js')
-const addressRoute = require('./routes/userAddressRoute.js')
-const profileRoute = require('./routes/userProfileRoute.js')
+
+import { database } from "./utils/database.js"
+import AuthRoute from './routes/authRoute.js'
+import UserRoute from './routes/userRoute.js'
+import ProductRoute from './routes/productRoute.js'
+import CartRoute from './routes/cartRoute.js'
+import favRoute from './routes/favRoute.js'
+import addressRoute from './routes/userAddressRoute.js'
+import profileRoute from './routes/userProfileRoute.js'
 const app = express()
 
 app.use(express.json())

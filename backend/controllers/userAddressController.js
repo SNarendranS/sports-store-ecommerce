@@ -1,8 +1,8 @@
-const UserAddress = require('../schemas/UserAddress');
-const User = require('../schemas/User');
+import UserAddress from '../schemas/UserAddress.js';
+import User from '../schemas/User.js';
 
 // ✅ Create a new address
-exports.createAddress = async (req, res) => {
+const createAddress = async (req, res) => {
   try {
     console.log("addressccreate",req.body)
     const { userid } = req.user
@@ -36,7 +36,7 @@ exports.createAddress = async (req, res) => {
 };
 
 // 📜 Get all addresses for a specific user
-exports.getUserAddresses = async (req, res) => {
+const getUserAddresses = async (req, res) => {
   try {
     const { userid } = req.user;
 
@@ -53,7 +53,7 @@ exports.getUserAddresses = async (req, res) => {
 };
 
 // 🔍 Get a single address by ID
-exports.getAddressById = async (req, res) => {
+const getAddressById = async (req, res) => {
   try {
     const { addressid } = req.params;
     const address = await UserAddress.findByPk(addressid);
@@ -70,7 +70,7 @@ exports.getAddressById = async (req, res) => {
 };
 
 // ✏️ Update an address
-exports.updateAddress = async (req, res) => {
+const updateAddress = async (req, res) => {
   try {
     const { addressid } = req.params;
     console.log("address",req.body)
@@ -91,7 +91,7 @@ exports.updateAddress = async (req, res) => {
 };
 
 // ❌ Delete an address
-exports.deleteAddress = async (req, res) => {
+const deleteAddress = async (req, res) => {
   try {
     const { addressid } = req.params;
     const deleted = await UserAddress.destroy({
@@ -107,4 +107,12 @@ exports.deleteAddress = async (req, res) => {
     console.error('Error deleting address:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
+};
+export {
+  createAddress,
+  getAddressById,
+  getUserAddresses,
+  deleteAddress,
+  updateAddress
+
 };

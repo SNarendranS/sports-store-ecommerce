@@ -1,7 +1,7 @@
-const User = require('../schemas/User');
+import User from '../schemas/User.js';
 
 // Get user by username
-const getUser = async (req, res) => {
+export const getUser = async (req, res) => {
   const { email } = req.user;
   console.log('user', email)
   try {
@@ -19,7 +19,7 @@ const getUser = async (req, res) => {
 };
 
 // Get user by ID
-const getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
   const id = req.params.id;
 
   try {
@@ -36,7 +36,7 @@ const getUserById = async (req, res) => {
 };
 
 // Update user details
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const { userid } = req.user
     const { updateDetail } = req.body;
@@ -79,8 +79,4 @@ const updateUser = async (req, res) => {
   }
 };
 
-module.exports = {
-  getUser,
-  getUserById,
-  updateUser,
-};
+

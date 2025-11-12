@@ -1,10 +1,10 @@
-const User = require('../schemas/User');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+import User from '../schemas/User.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 // Login
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password, remember } = req.body;
     const user = await User.findOne({ where: { email } });
@@ -31,7 +31,7 @@ const login = async (req, res) => {
 
 
 // User registration
-const register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     const createUser = { ...req.body, role: 'user' };
 
@@ -44,7 +44,7 @@ const register = async (req, res) => {
 };
 
 // Admin registration
-const adminRegister = async (req, res) => {
+export const adminRegister = async (req, res) => {
   try {
     const createUser = { ...req.body, role: 'admin' };
 
@@ -55,5 +55,3 @@ const adminRegister = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-module.exports = { login, register, adminRegister };

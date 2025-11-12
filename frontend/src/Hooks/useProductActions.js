@@ -74,7 +74,7 @@ const useProductActions = () => {
         toggleFavorite,
         fetchCart,
         removeFromCartCompletely,
-        
+
     };
 };
 

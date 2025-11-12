@@ -1,21 +1,21 @@
-const express = require('express');
+import express from 'express';
+import {createAddress,getAddressById,getUserAddresses,updateAddress,deleteAddress} from '../controllers/userAddressController.js';
+import authorizeMiddleware from '../middlewares/authorize.js';
 const router = express.Router();
-const userAddressController = require('../controllers/userAddressController');
-const authorizeMiddleware = require('../middlewares/authorize');
 
 // POST /api/addresses → create new address
-router.post('/',authorizeMiddleware, userAddressController.createAddress);
+router.post('/',authorizeMiddleware, createAddress);
 
 // GET /api/addresses/user/:userid → get all addresses for a user
-router.get('/', authorizeMiddleware, userAddressController.getUserAddresses);
+router.get('/', authorizeMiddleware, getUserAddresses);
 
 // GET /api/addresses/:addressid → get specific address
-router.get('/:addressid', authorizeMiddleware, userAddressController.getAddressById);
+router.get('/:addressid', authorizeMiddleware, getAddressById);
 
 // PUT /api/addresses/:addressid → update specific address
-router.put('/update/:addressid', authorizeMiddleware, userAddressController.updateAddress);
+router.put('/update/:addressid', authorizeMiddleware, updateAddress);
 
 // DELETE /api/addresses/:addressid → delete specific address
-router.delete('/:addressid', authorizeMiddleware, userAddressController.deleteAddress);
+router.delete('/:addressid', authorizeMiddleware, deleteAddress);
 
-module.exports = router;
+export default router;

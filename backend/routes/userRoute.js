@@ -1,6 +1,6 @@
-const express = require('express');
-const { getUser, getUserById, updateUser } = require('../controllers/userController');
-const authorizeMiddleware = require('../middlewares/authorize');
+import express from 'express';
+import { getUser, getUserById, updateUser } from '../controllers/userController.js';
+import authorizeMiddleware from '../middlewares/authorize.js';
 
 const router = express.Router();
 
@@ -14,4 +14,4 @@ router.get('/email', authorizeMiddleware, getUser);
 router.get('/:id', authorizeMiddleware, getUserById);
 
 
-module.exports = router;
+export default router;

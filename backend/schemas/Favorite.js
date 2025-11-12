@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const {sequelize} = require('../utils/database');
-const User = require('./User');
-const Product = require('./Product');
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../utils/database.js';
+import User from './User.js';
+import Product from './Product.js';
 const Favorite = sequelize.define('Favorite', {
   favoriteid: {
     type: DataTypes.INTEGER,
@@ -31,4 +31,4 @@ const Favorite = sequelize.define('Favorite', {
   timestamps: true,
 });
 
-module.exports = Favorite;
+export default Favorite;

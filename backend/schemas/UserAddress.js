@@ -1,6 +1,6 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/database');
-const User = require('./User'); // Ensure this model exists and exports correctly
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../utils/database.js';
+import User from './User.js'; // Ensure this model exists and exports correctly
 
 const UserAddress = sequelize.define('UserAddress', {
   addressid: {
@@ -57,4 +57,4 @@ const UserAddress = sequelize.define('UserAddress', {
 User.hasMany(UserAddress, { foreignKey: 'userid', onDelete: 'CASCADE' });
 UserAddress.belongsTo(User, { foreignKey: 'userid' });
 
-module.exports = UserAddress;
+export default UserAddress;
