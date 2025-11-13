@@ -73,7 +73,6 @@ const getAddressById = async (req, res) => {
 const updateAddress = async (req, res) => {
   try {
     const { addressid } = req.params;
-    console.log("address",req.body)
     const updated = await UserAddress.update(req.body.updateDetail, {
       where: { addressid },
     });

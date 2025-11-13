@@ -60,4 +60,22 @@ const removeFromFav = async (req, res) => {
   }
 };
 
-export { addToFav, getUserFav, removeFromFav }
+const findItemFav = async (req, res) => {
+  try {
+    const { userid } = req.user;
+    const { productid } = req.params;
+    const favItem = await Favorite.findOne({
+      where: { userid, productid }
+
+    });
+    if (favItem)
+      res.status(200).json(favItem);
+    else
+      res.status(404).json({ message: "item not found" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+export { addToFav, getUserFav, removeFromFav ,findItemFav}

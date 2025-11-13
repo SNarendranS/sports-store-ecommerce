@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cartService from '../Services/cartService';
 import ProductService from '../Services/productService';
+import favService from '../Services/favService';
 import {
     Box,
     CardMedia,
@@ -11,8 +12,15 @@ import {
     IconButton,
     Button,
     CircularProgress,
+    Stack,
 } from '@mui/material';
-import { Delete, Add, Remove } from '@mui/icons-material';
+import {
+    Delete,
+    Add,
+    Remove,
+    ArrowCircleLeft,
+    ShoppingCart as ShoppingCartIcon,
+} from '@mui/icons-material';
 import { getIsLoggedIn } from '../Utils/headerToken';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,14 +32,13 @@ const Cart = () => {
 
     const getCartItems = async () => {
         try {
-            setIsLoading(true)
+            setIsLoading(true);
             const res = await cartService.getUserCart();
             setCartItems(res || []);
         } catch (error) {
             console.error('Error fetching cart items:', error);
-        }
-        finally{
-            setIsLoading(false)
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -65,7 +72,6 @@ const Cart = () => {
     }, 0);
 
     const handleRemove = async (productid) => {
-        // Optimistic UI update
         setCartItems((prev) => prev.filter((item) => item.productid !== productid));
         setProducts((prev) => prev.filter((product) => product.productid !== productid));
 
@@ -75,6 +81,11 @@ const Cart = () => {
             console.error('Failed to remove item:', error);
             getCartItems();
         }
+    };
+
+    const handleMoveToFav = async (productid) => {
+        const res = await favService.add(productid);
+        if (res) handleRemove(productid);
     };
 
     const handleQuantityChange = async (productid, delta) => {
@@ -87,7 +98,6 @@ const Cart = () => {
             return;
         }
 
-        // Optimistic quantity update
         setCartItems((prev) =>
             prev.map((item) =>
                 item.productid === productid ? { ...item, quantity: newQty } : item
@@ -101,58 +111,96 @@ const Cart = () => {
             getCartItems();
         }
     };
+
     if (isLoading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-                <CircularProgress />
+                <CircularProgress size={60} />
             </Box>
         );
     }
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4, mb: 6 }}>
-            <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, boxShadow: 3 }}>
-                <Typography
-                    variant="h5"
-                    fontWeight="bold"
-                    align="center"
-                    gutterBottom
-                >
-                    Your Cart
+        <Container maxWidth="md" sx={{ mt: 6, mb: 8 }}>
+            {/* Header Section */}
+            <Paper
+                sx={{
+                    p: 3,
+                    mb: 4,
+                    borderRadius: 4,
+                    background: 'linear-gradient(135deg, #42a5f5, #7e57c2)',
+                    color: '#fff',
+                    textAlign: 'center',
+                    boxShadow: 3,
+                }}
+            >
+                <ShoppingCartIcon sx={{ fontSize: 40, mb: 1 }} />
+                <Typography variant="h5" fontWeight="bold">
+                    Your Shopping Cart
                 </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    Review your items and proceed to checkout 🛍️
+                </Typography>
+            </Paper>
 
-                {products.length <= 0 ? (
-                    <Box textAlign="center" mt={6}>
-                        <Typography>
-                            {getIsLoggedIn() ? (
-                                'No items in your cart.'
-                            ) : (
-                                <Button onClick={() => navigate('/')}>Login to view your cart</Button>
-                            )}
-                        </Typography>
-                    </Box>
-                ) : (
-                    <>
+            {/* Cart Content */}
+            {products.length <= 0 ? (
+                <Box textAlign="center" mt={6}>
+                    {getIsLoggedIn() ? (
+                        <>
+                            <Typography variant="h6" color="text.secondary">
+                                Your cart is empty
+                            </Typography>
+                            <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
+                                Start shopping and fill it up with your favorite products!
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                sx={{
+                                    mt: 3,
+                                    borderRadius: 3,
+                                    textTransform: 'none',
+                                    background: 'linear-gradient(135deg, #42a5f5, #7e57c2)',
+                                }}
+                                onClick={() => navigate('/')}
+                            >
+                                Shop Now
+                            </Button>
+                        </>
+                    ) : (
+                        <Button
+                            variant="contained"
+                            sx={{ mt: 3, borderRadius: 3 }}
+                            onClick={() => navigate('/')}
+                        >
+                            Login to view your cart
+                        </Button>
+                    )}
+                </Box>
+            ) : (
+                <>
+                    <Stack spacing={2}>
                         {products.map((product) => {
                             const quantity = getQuantity(product.productid);
                             return (
-                                <Box
+                                <Paper
                                     key={product.productid}
+                                    elevation={3}
                                     sx={{
                                         display: 'flex',
                                         flexDirection: { xs: 'column', sm: 'row' },
-                                        alignItems: { xs: 'flex-start', sm: 'center' },
+                                        alignItems: 'center',
                                         justifyContent: 'space-between',
-                                        p: 2,
-                                        mb: 2,
-                                        borderRadius: 2,
-                                        boxShadow: 1,
-                                        backgroundColor: '#fdfdfd',
-                                        '&:hover': { boxShadow: 3 },
-                                        gap: { xs: 1.5, sm: 2 },
+                                        p: 2.5,
+                                        borderRadius: 3,
+                                        transition: '0.3s',
+                                        '&:hover': {
+                                            transform: 'translateY(-4px)',
+                                            boxShadow: 6,
+                                        },
                                     }}
                                 >
-                                    {/* Left: Image + Name */}
+                                    {/* Product Info */}
                                     <Box
                                         sx={{
                                             display: 'flex',
@@ -167,92 +215,142 @@ const Cart = () => {
                                             image={product.img}
                                             alt={product.name}
                                             sx={{
-                                                width: 60,
-                                                height: 60,
-                                                borderRadius: 1,
+                                                width: 80,
+                                                height: 80,
+                                                borderRadius: 3,
                                                 objectFit: 'cover',
+                                                boxShadow: 1,
                                             }}
                                         />
-                                        <Typography
-                                            fontWeight="medium"
-                                            sx={{
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                maxWidth: '100%',
-                                            }}
-                                        >
-                                            {product.name}
-                                        </Typography>
+                                        <Box>
+                                            <Typography
+                                                variant="subtitle1"
+                                                fontWeight="bold"
+                                                noWrap
+                                                sx={{ maxWidth: 180 }}
+                                            >
+                                                {product.name}
+                                            </Typography>
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                sx={{ mt: 0.5 }}
+                                            >
+                                                ₹{product.price?.toFixed(2) || 'N/A'}
+                                            </Typography>
+                                        </Box>
                                     </Box>
 
-                                    {/* Middle: Quantity controls */}
+                                    {/* Quantity Controls */}
                                     <Box
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: { xs: 'flex-start', sm: 'center' },
-                                            flex: { xs: '1 1 auto', sm: '0 0 140px' },
-                                            mt: { xs: 1, sm: 0 },
+                                            gap: 1.5,
+                                            mt: { xs: 2, sm: 0 },
                                         }}
                                     >
-                                        <IconButton onClick={() => handleQuantityChange(product.productid, -1)}>
+                                        <IconButton
+                                            onClick={() => handleQuantityChange(product.productid, -1)}
+                                            sx={{ backgroundColor: '#f3f3f3', '&:hover': { backgroundColor: '#e0e0e0' } }}
+                                        >
                                             <Remove />
                                         </IconButton>
-                                        <Typography>{quantity}</Typography>
-                                        <IconButton onClick={() => handleQuantityChange(product.productid, 1)}>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            {quantity}
+                                        </Typography>
+                                        <IconButton
+                                            onClick={() => handleQuantityChange(product.productid, 1)}
+                                            sx={{ backgroundColor: '#f3f3f3', '&:hover': { backgroundColor: '#e0e0e0' } }}
+                                        >
                                             <Add />
                                         </IconButton>
                                     </Box>
 
-                                    {/* Right: Price + Delete */}
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: { xs: 'row', sm: 'column' },
-                                            justifyContent: { xs: 'space-between', sm: 'flex-end' },
-                                            alignItems: { xs: 'center', sm: 'flex-end' },
-                                            width: { xs: '100%', sm: 'auto' },
-                                            mt: { xs: 1, sm: 0 },
-                                        }}
+                                    {/* Price + Actions */}
+                                    <Stack
+                                        direction="row"
+                                        spacing={1.5}
+                                        alignItems="center"
+                                        sx={{ mt: { xs: 2, sm: 0 } }}
                                     >
                                         <Typography
                                             fontWeight="bold"
-                                            sx={{ mt: { sm: 0.5 }, fontSize: { xs: '1rem', sm: '1.05rem' } }}
+                                            variant="body1"
+                                            color="primary"
+                                            sx={{ minWidth: 80, textAlign: 'right' }}
                                         >
                                             ₹{(quantity * product.price).toFixed(2)}
                                         </Typography>
+
+                                        <Button
+                                            variant="text"
+                                            size="small"
+                                            startIcon={<ArrowCircleLeft />}
+                                            onClick={() => handleMoveToFav(product.productid)}
+                                            sx={{
+                                                textTransform: 'none',
+                                                color: '#7e57c2',
+                                                '&:hover': { color: '#5e35b1' },
+                                            }}
+                                        >
+                                            Move to Favorite
+                                        </Button>
+
                                         <IconButton
-                                            sx={{ color: 'red', ml: { xs: 1, sm: 0 } }}
+                                            sx={{
+                                                color: '#e57373',
+                                                '&:hover': { color: '#c62828', transform: 'scale(1.2)' },
+                                                transition: '0.3s',
+                                            }}
                                             onClick={() => handleRemove(product.productid)}
                                         >
                                             <Delete />
                                         </IconButton>
-                                    </Box>
-                                </Box>
+                                    </Stack>
+                                </Paper>
                             );
                         })}
+                    </Stack>
 
-                        <Divider sx={{ my: 2 }} />
+                    {/* Total Section */}
+                    <Divider sx={{ my: 3 }} />
+                    <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        flexWrap="wrap"
+                        gap={2}
+                    >
+                        <Typography fontWeight="bold" variant="h6">
+                            Total:
+                        </Typography>
+                        <Typography fontWeight="bold" variant="h6" color="primary">
+                            ₹{totalPrice.toFixed(2)}
+                        </Typography>
+                    </Box>
 
-                        {/* Total Section */}
-                        <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            flexWrap="wrap"
-                            gap={2}
-                        >
-                            <Typography fontWeight="bold" variant="h6">
-                                Total:
-                            </Typography>
-                            <Typography fontWeight="bold" variant="h6" color="primary">
-                                ₹{totalPrice.toFixed(2)}
-                            </Typography>
-                        </Box>
-                    </>
-                )}
-            </Paper>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        sx={{
+                            mt: 3,
+                            py: 1.5,
+                            borderRadius: 3,
+                            textTransform: 'none',
+                            fontSize: '1rem',
+                            background: 'linear-gradient(135deg, #42a5f5, #7e57c2)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #1e88e5, #5e35b1)',
+                            },
+                        }}
+                    >
+                        Proceed to Checkout
+                    </Button>
+                </>
+            )}
         </Container>
     );
 };

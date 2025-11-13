@@ -1,24 +1,47 @@
 // hooks/useProductActions.js
 import { useState, useEffect } from 'react';
 import cartService from '../Services/cartService';
+import FavoriteService from '../Services/favService';
 
 const useProductActions = () => {
     const [cartItems, setCartItems] = useState([]);
     const [favItems, setFavItems] = useState([]);
-
-    // ✅ On mount, load saved state from localStorage
+    const getUserCart = async () => {
+        try {
+            const res = await cartService.getUserCart();
+            if (res) {
+                const productIds = res.map((item) => item.productid);
+                setCartItems(productIds);
+            }
+        } catch (error) {
+            console.error('Error fetching cart:', error);
+        }
+    };
+    const getUserFav = async () => {
+        try {
+            const res = await FavoriteService.getUserFav(); 
+            if (res) {
+                const productIds = res.map((item) => item.productid);
+                setFavItems(productIds);
+            }
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+        }
+    };
     useEffect(() => {
-        const savedCart = JSON.parse(localStorage.getItem('cartItems')) || [];
-        const savedFavs = JSON.parse(localStorage.getItem('favItems')) || [];
-        setCartItems(savedCart);
-        setFavItems(savedFavs);
+
+        getUserCart();
+        getUserFav();
     }, []);
 
 
     // ✅ Check if item exists
-    const isInCart = (productId) => cartItems.includes(productId);
-    const isFavorite = (productId) => favItems.includes(productId);
-
+    const isInCart = (productId) => {
+        return cartItems.includes(productId);
+    }
+    const isFavorite = (productId) => {
+        return favItems.includes(productId);
+    }
     // ✅ Toggle Cart
     const toggleCart = async (productId) => {
         try {
@@ -35,12 +58,19 @@ const useProductActions = () => {
     };
 
     // ✅ Toggle Favorite
-    const toggleFavorite = (productId) => {
-        setFavItems((prev) =>
-            prev.includes(productId)
-                ? prev.filter((id) => id !== productId)
-                : [...prev, productId]
-        );
+    const toggleFavorite = async (productId) => {
+        try {
+            if (isFavorite(productId)) {
+                await FavoriteService.remove(productId);
+                setFavItems((prev) => prev.filter((id) => id !== productId));
+            } else {
+                await FavoriteService.add(productId);
+                setFavItems((prev) => [...prev, productId]);
+            }
+        } catch (error) {
+            console.error('Error updating favorites:', error);
+        }
+
     };
 
     // ✅ Fetch Cart from backend

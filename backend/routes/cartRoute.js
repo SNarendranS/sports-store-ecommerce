@@ -4,18 +4,18 @@ import {addToCart,removeFromCart,getUserCart,updateCartItem,findItemCart} from '
 import authorize  from '../middlewares/authorize.js';
 
 // Add item to cart
-router.post('/add',authorize, addToCart);
+router.post('/',authorize, addToCart);
 
 // Get all items for a user
-router.get('/user/',authorize, getUserCart);
+router.get('/',authorize, getUserCart);
 
 // Update quantity
-router.put('/update',authorize, updateCartItem);
+router.put('/',authorize, updateCartItem);
 
 // Remove item
-router.delete('/remove',authorize, removeFromCart);
+router.delete('/',authorize, removeFromCart);
 
 
-router.get('/user/find/:productid',authorize, findItemCart);
+router.get('/find/:productid',authorize, findItemCart);
 
 export default router;

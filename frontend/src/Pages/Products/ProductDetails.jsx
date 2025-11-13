@@ -1,42 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import { AddShoppingCart, Favorite, Close, Delete, HeartBroken } from '@mui/icons-material';
-import { Typography, Grid, IconButton, Box, CardMedia, Button, Chip, Paper, Container } from '@mui/material';
+import {
+  AddShoppingCart,
+  Favorite,
+  Close,
+  Delete,
+  HeartBroken,
+} from '@mui/icons-material';
+import {
+  Typography,
+  Grid,
+  IconButton,
+  Box,
+  CardMedia,
+  Button,
+  Chip,
+  Container,
+  Divider,
+  Paper,
+} from '@mui/material';
 import cartService from '../../Services/cartService';
 import favService from '../../Services/favService';
 
 const ProductDetails = ({ product, handleClose }) => {
   const [inCart, setInCart] = useState(false);
   const [fav, setFav] = useState(false);
+
   const toggleCart = async () => {
-    if (!product.productid) return
-    const productId = product.productid
+    if (!product?.productid) return;
     try {
       if (inCart) {
-        await cartService.removeFromCart(productId);
+        await cartService.removeFromCart(product.productid);
       } else {
-        await cartService.addToCart(productId, 1);
+        await cartService.addToCart(product.productid, 1);
       }
-      setInCart(prev => !prev)
-
+      setInCart((prev) => !prev);
     } catch (error) {
       console.error('Error updating cart:', error);
     }
   };
+
   const toggleFavorite = async () => {
-    if (!product.productid) return
-    const productId = product.productid
+    if (!product?.productid) return;
     try {
       if (fav) {
-        //await favService.remove(productId);
+        await favService.remove(product.productid);
       } else {
-        // await favService.add(productId);
+        await favService.add(product.productid);
       }
-      setFav(prev => !prev)
-
+      setFav((prev) => !prev);
     } catch (error) {
-      console.error('Error updating cart:', error);
+      console.error('Error updating fav:', error);
     }
   };
+
   useEffect(() => {
     const fetchCartItem = async () => {
       try {
@@ -49,16 +65,36 @@ const ProductDetails = ({ product, handleClose }) => {
     if (product) fetchCartItem();
   }, [product]);
 
-  if (!product) return <Typography>No product selected.</Typography>;
+  useEffect(() => {
+    const fetchFavItem = async () => {
+      try {
+        const res = await favService.FindItem(product.productid);
+        if (res) setFav(true);
+      } catch {
+        setFav(false);
+      }
+    };
+    if (product) fetchFavItem();
+  }, [product]);
 
-  const discountedPrice = Math.ceil(product.price - (product.discount / 100) * product.price);
+  if (!product)
+    return (
+      <Typography variant="h6" textAlign="center">
+        No product selected.
+      </Typography>
+    );
+
+  const discountedPrice = Math.ceil(
+    product.price - (product.discount / 100) * product.price
+  );
 
   return (
-    <Container
+    <Paper
+      elevation={4}
       sx={{
-        p: 3,
-        borderRadius: 3,
-        maxHeight: '100vh',
+        borderRadius: 4,
+        overflow: 'hidden',
+        position: 'relative',
         backgroundColor: 'background.paper',
       }}
     >
@@ -70,112 +106,171 @@ const ProductDetails = ({ product, handleClose }) => {
           top: 10,
           right: 10,
           color: 'grey.600',
-          '&:hover': { color: 'error.main' },
+          zIndex: 5,
+          '&:hover': { color: 'error.main', transform: 'rotate(90deg)' },
+          transition: '0.3s ease',
         }}
       >
         <Close />
       </IconButton>
 
-      {/* Product Image */}
-      <CardMedia
-        component="img"
-        image={product.img}
-        alt={product.name}
+      {/* Header Section */}
+      <Box
         sx={{
-          borderRadius: 2,
-          objectFit: 'cover',
-          mb: 3,
-          height: 300,
-          width: '100%',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+          background: 'linear-gradient(135deg, #42a5f5, #7e57c2)',
+          color: '#fff',
+          textAlign: 'center',
+          py: 3,
         }}
-      />
-
-      {/* Product Info */}
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
-        {product.name}
-      </Typography>
-
-      <Typography variant="body2" color="text.secondary" gutterBottom>
-        Category: {product.category}
-      </Typography>
-
-      <Typography variant="body2" fontWeight="medium" gutterBottom>
-        Stock: {product.availableStock}
-      </Typography>
-
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {product.des}
-      </Typography>
-
-      {/* Price & Discount */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, my: 2 }}>
-        {product.discount > 0 && (
-          <Chip
-            label={`-${product.discount}%`}
-            color="secondary"
-            size="small"
-            sx={{ fontWeight: 'bold' }}
-          />
-        )}
-        {product.discount > 0 && (
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{ textDecoration: 'line-through' }}
-          >
-            ₹{product.price}
-          </Typography>
-        )}
-        <Typography variant="h6" color="primary" fontWeight="bold">
-          ₹{discountedPrice}
+      >
+        <Typography variant="h5" fontWeight="bold">
+          {product.name}
+        </Typography>
+        <Typography variant="body2" sx={{ opacity: 0.9 }}>
+          {product.category}
         </Typography>
       </Box>
 
-      {/* Action Buttons */}
-      <Grid container spacing={2} sx={{ mt: 2, justifyContent: 'space-between' }}>
-        <Grid item xs={6}>
-          <Button
-            fullWidth
-            variant={fav ? 'contained' : 'outlined'}
-            color="error"
-            startIcon={fav?<HeartBroken/>:<Favorite />}
-            onClick={() => {
-              toggleFavorite(product.productid);
-            }}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 'bold',
-              py: 1.5,
-              minWidth: '210px'
+      {/* Product Image */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          mt: 2, // ✅ no overlap
+          mb: 2,
+        }}
+      >
+        <CardMedia
+          component="img"
+          image={product.img}
+          alt={product.name}
+          sx={{
+            borderRadius: 3,
+            objectFit: 'cover',
+            width: '90%',
+            height: 280,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+          }}
+        />
+      </Box>
 
-            }}
+      <Container sx={{ pb: 4 }}>
+        {/* Info Section */}
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          {product.discount > 0 && (
+            <Chip
+              label={`${product.discount}% OFF`}
+              color="error"
+              sx={{
+                mb: 1.5,
+                fontWeight: 'bold',
+                background: 'linear-gradient(135deg, #ff7043, #f06292)',
+                color: '#fff',
+              }}
+            />
+          )}
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 1 }}
           >
-            {fav ? 'Remove from Favorite' : 'Add to Favorite'}
-          </Button>
-        </Grid>
+            {product.des}
+          </Typography>
+          <Typography
+            variant="body2"
+            fontWeight="medium"
+            color="text.secondary"
+          >
+            Available Stock: {product.availableStock}
+          </Typography>
+        </Box>
 
-        <Grid item xs={6} >
-          <Button
-            fullWidth
-            variant={inCart ? 'outlined' : "contained"}
-            color={inCart ? 'error' : "primary"}
-            startIcon={inCart ? <Delete /> : <AddShoppingCart />}
-            onClick={() => {
-              toggleCart();
-            }}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 'bold',
-              py: 1.5,
-              minWidth: '180px'
-            }}
+        <Divider sx={{ my: 2 }} />
+
+        {/* Pricing */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'baseline',
+            gap: 2,
+            mb: 3,
+          }}
+        >
+          {product.discount > 0 && (
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ textDecoration: 'line-through' }}
+            >
+              ₹{product.price}
+            </Typography>
+          )}
+          <Typography
+            variant="h5"
+            color="primary"
+            fontWeight="bold"
           >
-            {inCart ? 'Remove from Cart' : 'Add to Cart'}
-          </Button>
+            ₹{discountedPrice}
+          </Typography>
+        </Box>
+
+        {/* Action Buttons */}
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} sm={6}>
+            <Button
+              fullWidth
+              variant={fav ? 'contained' : 'outlined'}
+              color="error"
+              startIcon={fav ? <HeartBroken /> : <Favorite />}
+              onClick={toggleFavorite}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 'bold',
+                py: 1.4,
+                borderRadius: 3,
+                boxShadow: fav ? '0 4px 10px rgba(244,67,54,0.3)' : 'none',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 14px rgba(244,67,54,0.4)',
+                },
+              }}
+            >
+              {fav ? 'Remove Favorite' : 'Add to Favorite'}
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button
+              fullWidth
+              variant={inCart ? 'outlined' : 'contained'}
+              color={inCart ? 'error' : 'primary'}
+              startIcon={inCart ? <Delete /> : <AddShoppingCart />}
+              onClick={toggleCart}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 'bold',
+                py: 1.4,
+                borderRadius: 3,
+                boxShadow: inCart
+                  ? 'none'
+                  : '0 4px 10px rgba(25,118,210,0.3)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: inCart
+                    ? '0 4px 12px rgba(244,67,54,0.3)'
+                    : '0 6px 14px rgba(25,118,210,0.4)',
+                },
+              }}
+            >
+              {inCart ? 'Remove from Cart' : 'Add to Cart'}
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </Paper>
   );
 };
 

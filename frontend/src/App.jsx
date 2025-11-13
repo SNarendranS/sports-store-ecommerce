@@ -1,27 +1,40 @@
-import { BrowserRouter, Routes } from "react-router-dom"
-import { AppBarLayout } from "./Layouts/AppBarLayout"
-import BodyLayout from "./Layouts/BodyLayout"
-import FooterLayout from "./Layouts/FooterLayout"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AppBarLayout } from "./Layouts/AppBarLayout";
+import BodyLayout from "./Layouts/BodyLayout";
+import FooterLayout from "./Layouts/FooterLayout";
 
-import { useState } from "react"
-import SecondaryBar from "./Pages/Products/SecondaryBar"
+import { useState } from "react";
+import SecondaryBar from "./Pages/Products/SecondaryBar";
+import { Container, useMediaQuery } from "@mui/material";
 
 function App() {
-  const [searchText, SetSearchText] = useState('')
-  const isSmallScreen = window.innerWidth <= 600; // simple example
+  const [searchText, SetSearchText] = useState('');
+  const isMobile = useMediaQuery('(max-width:768px)');
 
   return (
     <BrowserRouter>
+      {/* Top App Bar */}
       <AppBarLayout />
 
-      <div style={{ margin: isSmallScreen ? '15%' : '12%' }}>
+      {/* Secondary Bar (Products search / categories / icons) */}
+      <SecondaryBar />
+
+      {/* Main content */}
+      <Container sx={{ mt: isMobile ? 24 : 20 }}> 
+        {/* Adjust margin top so content isn't hidden under AppBars */}
         <BodyLayout searchText={searchText} />
-      </div>
+      </Container>
 
+      {/* Footer */}
       <FooterLayout />
-    </BrowserRouter>
 
-  )
+      {/* Optional: Add Routes here for different pages */}
+      <Routes>
+        {/* Example route */}
+        {/* <Route path="/products" element={<ProductsPage />} /> */}
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
