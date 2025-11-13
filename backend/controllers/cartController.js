@@ -75,7 +75,7 @@ export const removeFromCart = async (req, res) => {
     const deleted = await Cart.destroy({ where: { userid, productid } });
 
     if (!deleted) return res.status(404).json({ message: 'Cart item not found' });
-
+    
     res.status(200).json({ message: 'Item removed from cart' });
   } catch (error) {
     console.error(error);
@@ -86,7 +86,7 @@ export const removeFromCart = async (req, res) => {
 export const findItemCart = async (req, res) => {
   try {
     const { userid } = req.user;
-    const { productid } = req.params; 
+    const { productid } = req.params;
     const cartItem = await Cart.findOne({
       where: { userid, productid }
 

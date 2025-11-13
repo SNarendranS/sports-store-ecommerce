@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Favorite, Search, Close } from '@mui/icons-material';
+import { io } from 'socket.io-client';
+
 import {
     AppBar,
     Toolbar,
@@ -29,13 +31,15 @@ const SecondaryBar = () => {
     const dispatch = useDispatch();
     const searchText = useSelector((state) => state.search.searchText);
     const categoryValue = useSelector((state) => state.category.value);
-
     const navigate = useNavigate();
     const isMobile = useMediaQuery('(max-width:768px)');
 
     const fetchCart = async () => {
+
         const res = await cartService.getUserCart();
         if (res) setCartItems(res);
+
+
     };
 
     const fetchFavorites = async () => setFavItems([]);
@@ -47,21 +51,13 @@ const SecondaryBar = () => {
     };
 
     useEffect(() => {
+
         fetchCart();
-        fetchFavorites();
         fetchCategories();
+        fetchFavorites();
 
-        const updateCart = async () => await fetchCart();
-        const updateFav = async () => await fetchFavorites();
-
-        window.addEventListener('cartToggled', updateCart);
-        window.addEventListener('favToggled', updateFav);
-
-        return () => {
-            window.removeEventListener('cartToggled', updateCart);
-            window.removeEventListener('favToggled', updateFav);
-        };
     }, []);
+
 
     const handleSearchChange = (e) => dispatch(setSearchText(e.target.value));
     const handleCategoryChange = (e) => dispatch(setCategoryValue(e.target.value));

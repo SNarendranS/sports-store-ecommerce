@@ -10,6 +10,7 @@ import {
     Divider,
     IconButton,
     Button,
+    CircularProgress,
 } from '@mui/material';
 import { Delete, Add, Remove } from '@mui/icons-material';
 import { getIsLoggedIn } from '../Utils/headerToken';
@@ -19,13 +20,18 @@ const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [products, setProducts] = useState([]);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     const getCartItems = async () => {
         try {
+            setIsLoading(true)
             const res = await cartService.getUserCart();
             setCartItems(res || []);
         } catch (error) {
             console.error('Error fetching cart items:', error);
+        }
+        finally{
+            setIsLoading(false)
         }
     };
 
@@ -95,6 +101,13 @@ const Cart = () => {
             getCartItems();
         }
     };
+    if (isLoading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     return (
         <Container maxWidth="md" sx={{ mt: 4, mb: 6 }}>

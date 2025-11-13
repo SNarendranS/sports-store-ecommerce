@@ -18,7 +18,7 @@ export const login = async (req, res) => {
 
     // JWT expires in 7 days if remember is true, otherwise 1 day
     const token = jwt.sign(
-      { email,name, role, userid },
+      { email, name, role, userid },
       process.env.JSON_SECRETKEY,
       { expiresIn: remember ? "7d" : "1d" } // backend expiration
     );
