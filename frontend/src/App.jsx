@@ -4,7 +4,7 @@ import BodyLayout from "./Layouts/BodyLayout";
 import FooterLayout from "./Layouts/FooterLayout";
 
 import { useState } from "react";
-import SecondaryBar from "./Pages/Products/SecondaryBar";
+import SecondaryBar from "./Layouts/SecondaryBar";
 import { Container, useMediaQuery } from "@mui/material";
 
 function App() {
@@ -28,11 +28,6 @@ function App() {
       {/* Footer */}
       <FooterLayout />
 
-      {/* Optional: Add Routes here for different pages */}
-      <Routes>
-        {/* Example route */}
-        {/* <Route path="/products" element={<ProductsPage />} /> */}
-      </Routes>
     </BrowserRouter>
   );
 }

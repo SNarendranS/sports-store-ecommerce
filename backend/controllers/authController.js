@@ -8,7 +8,7 @@ export const login = async (req, res) => {
   try {
     const { email, password, remember } = req.body;
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(401).json({ message: "Invalid username!" });
+    if (!user) return res.status(401).json({ message: "Invalid email!" });
 
     const isPasswordValid = await user.validatePassword(password);
     if (!isPasswordValid)
@@ -18,7 +18,7 @@ export const login = async (req, res) => {
 
     // JWT expires in 7 days if remember is true, otherwise 1 day
     const token = jwt.sign(
-      { email, name, role, userid },
+      { email, name, role, userid }, 
       process.env.JSON_SECRETKEY,
       { expiresIn: remember ? "7d" : "1d" } // backend expiration
     );

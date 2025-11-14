@@ -18,6 +18,8 @@ const getAllOfferProducts = () => axios.get(`${API_URI}/offers`);
 const getAllProductsCategories = () => axios.get(`${API_URI}/category`);
 
 const getProductById = (id) => axios.get(`${API_URI}/${id}`);
+const availableStock = (productid) => axios.post(`${API_URI}/stock`, productid);
+
 const createProduct = (productData) => axios.post(`${API_URI}`, productData, getAuthConfig());
 const updateProduct = (id, updateData) => axios.put(`${API_URI}/${id}`, updateData, getAuthConfig());
 const deleteProduct = (id) => axios.delete(`${API_URI}/${id}`, getAuthConfig());
@@ -28,7 +30,8 @@ const ProductService = {
   updateProduct,
   deleteProduct,
   getAllOfferProducts,
-  getAllProductsCategories
+  getAllProductsCategories,
+  availableStock
 };
 
 export default ProductService;

@@ -104,6 +104,7 @@ export default function Signup() {
         sx={{
           mt: 8,
           p: 4,
+          mb: 2,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

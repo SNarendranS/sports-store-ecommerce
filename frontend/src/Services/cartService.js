@@ -40,7 +40,7 @@ const updateCartItem = async (productid, quantity) => {
     return response.data;
   } catch (error) {
     console.error('Error updating cart item:', error.response?.data || error.message);
-    throw error;
+    return error;
   }
 };
 

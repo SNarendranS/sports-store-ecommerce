@@ -13,6 +13,7 @@ import ProductService from '../../Services/productService';
 import { useRedux } from '../../Hooks/useRedux';
 import { setSearchText } from '../../redux/searchSlice';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import { calcDiscountedPrice } from '../../Utils/discountCalc';
 
 const Products = ({ offers }) => {
   const [data, setData] = useState([]);
@@ -41,7 +42,8 @@ const Products = ({ offers }) => {
   const filteredData = data.filter(
     (item) =>
       (item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        item.price.toString().includes(searchText)) &&
+        item.price.toString().includes(searchText) ||
+        calcDiscountedPrice(item.price, item.discount).toString().includes(searchText)) &&
       (!categoryValue ||
         categoryValue.toLowerCase() === 'all' ||
         categoryValue === '' ||
@@ -87,9 +89,8 @@ const Products = ({ offers }) => {
       {filteredData.length > 0 ? (
         <Grid
           container
-          spacing={3}
+          spacing={4}
           justifyContent="center"
-          sx={{ px: { xs: 2, sm: 3 } }}
         >
           {filteredData.map((element, index) => (
             <Grid item key={index}>

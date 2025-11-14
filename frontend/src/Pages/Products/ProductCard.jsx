@@ -10,62 +10,71 @@ import {
   Chip,
   Dialog,
   DialogContent,
+  DialogActions,
+  Button,
   Tooltip,
 } from '@mui/material';
 import { AddShoppingCart, Favorite } from '@mui/icons-material';
 import ProductDetails from './ProductDetails';
 import useProductActions from '../../Hooks/useProductActions';
 import cartService from '../../Services/cartService';
-import QuantityPopup from './QuantityPopup';
-import ItemAdded from './ItemAdded';
+import { calcDiscountedPrice } from '../../Utils/discountCalc';
+import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ cardData }) => {
-  const [open, setOpen] = useState(false);
-  const [openQ, setOpenQ] = useState(false);
-  const [openI, setOpenI] = useState(false);
-  const [cartQuantity, setCartQuantity] = useState(0);
+  const [openDetails, setOpenDetails] = useState(false);
+  const [cartPopup, setCartPopup] = useState({ open: false, message: '' });
 
-  const { isInCart, isFavorite, toggleCart, toggleFavorite } =
-    useProductActions();
-
+  const { isInCart, isFavorite, toggleCart, toggleFavorite } = useProductActions();
   const inCart = isInCart(cardData.productid);
   const fav = isFavorite(cardData.productid);
 
-  const discountedPrice = Math.ceil(
-    cardData.price - (cardData.discount / 100) * cardData.price
-  );
+  const discountedPrice = calcDiscountedPrice(cardData.price, cardData.discount);
+  const navigate = useNavigate();
 
   const handleCartClick = async (e) => {
     e.stopPropagation();
     try {
       const res = await cartService.FindItemInCart(cardData.productid);
+
       if (res && res !== 404) {
-        setCartQuantity(res.quantity || 1);
-        setOpenQ(true);
+        // Item already in cart
+        setCartPopup({ open: true, message: 'Item is already in your cart.' });
       } else {
-        setOpenI(true);
+        // Add to cart
         toggleCart(cardData.productid);
         window.dispatchEvent(
           new CustomEvent('cartToggled', { detail: cardData.productid })
         );
+        setCartPopup({ open: true, message: 'Item added to cart successfully!' });
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        setOpenI(true);
+        // Add to cart
         toggleCart(cardData.productid);
         window.dispatchEvent(
           new CustomEvent('cartToggled', { detail: cardData.productid })
         );
+        setCartPopup({ open: true, message: 'Item added to cart successfully!' });
       } else {
         console.error('Error fetching cart item:', error);
       }
     }
   };
 
+  const handleGoToCart = () => {
+    setCartPopup({ ...cartPopup, open: false });
+    navigate('/cart');
+  };
+
+  const handleContinueShopping = () => {
+    setCartPopup({ ...cartPopup, open: false });
+  };
+
   return (
     <>
       <Card
-        onClick={() => setOpen(true)}
+        onClick={() => setOpenDetails(true)}
         sx={{
           width: 270,
           borderRadius: 4,
@@ -73,8 +82,8 @@ const ProductCard = ({ cardData }) => {
           boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
           transition: 'transform 0.25s ease, box-shadow 0.3s ease',
           '&:hover': {
-            transform: 'translateY(-6px)',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 10px 25px rgba(0, 33, 200, 0.15)',
           },
           cursor: 'pointer',
         }}
@@ -87,7 +96,6 @@ const ProductCard = ({ cardData }) => {
             height="180"
             sx={{ objectFit: 'cover' }}
           />
-
           {cardData.discount > 0 && (
             <Chip
               label={`${cardData.discount}% OFF`}
@@ -95,8 +103,7 @@ const ProductCard = ({ cardData }) => {
                 position: 'absolute',
                 top: 15,
                 left: 15,
-                background:
-                  'linear-gradient(135deg, #ff7043, #f06292)',
+                background: 'linear-gradient(135deg, #ff7043, #f06292)',
                 color: '#fff',
                 fontWeight: 'bold',
               }}
@@ -159,16 +166,12 @@ const ProductCard = ({ cardData }) => {
           </Box>
 
           <Grid container justifyContent="space-between" alignItems="center">
-            <Tooltip
-              title={fav ? 'Remove from Favorites' : 'Add to Favorites'}
-            >
+            <Tooltip title={fav ? 'Remove from Favorites' : 'Add to Favorites'}>
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
                   window.dispatchEvent(
-                    new CustomEvent('favToggled', {
-                      detail: cardData.productid,
-                    })
+                    new CustomEvent('favToggled', { detail: cardData.productid })
                   );
                   toggleFavorite(cardData.productid);
                 }}
@@ -201,28 +204,32 @@ const ProductCard = ({ cardData }) => {
       </Card>
 
       {/* Product Details Modal */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+      <Dialog open={openDetails} onClose={() => setOpenDetails(false)} fullWidth maxWidth="sm">
         <DialogContent>
-          <ProductDetails product={cardData} handleClose={() => setOpen(false)} />
+          <ProductDetails product={cardData} handleClose={() => setOpenDetails(false)} />
         </DialogContent>
       </Dialog>
 
-      {/* Quantity Popup */}
-      <Dialog open={openQ} onClose={() => setOpenQ(false)} fullWidth maxWidth="sm">
+      {/* Unified Cart Action Popup */}
+      <Dialog
+        open={cartPopup.open}
+        onClose={handleContinueShopping}
+        fullWidth
+        maxWidth="xs"
+      >
         <DialogContent>
-          <QuantityPopup
-            product={cardData}
-            initialQuantity={cartQuantity}
-            handleClose={() => setOpenQ(false)}
-          />
+          <Typography variant="h6" fontWeight="bold" textAlign="center">
+            {cartPopup.message}
+          </Typography>
         </DialogContent>
-      </Dialog>
-
-      {/* Item Added Popup */}
-      <Dialog open={openI} onClose={() => setOpenI(false)} fullWidth maxWidth="sm">
-        <DialogContent>
-          <ItemAdded handleClose={() => setOpenI(false)} />
-        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+          <Button variant="contained" color="primary" onClick={handleGoToCart}>
+            Go to Cart
+          </Button>
+          <Button variant="outlined" onClick={handleContinueShopping}>
+            Continue Shopping
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

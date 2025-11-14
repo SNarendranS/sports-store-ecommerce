@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use, useRef } from "react";
 import {
   Avatar,
   Box,
@@ -17,9 +17,13 @@ import EmailIcon from "@mui/icons-material/Email";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../Services/authService"; // make sure path is correct
+import { useDispatch } from "react-redux";
+import { setIsLoggedIn } from "../redux/loggedInSlice";
 
 export default function LoginFormik() {
   const navigate = useNavigate();
+  const loginButton = useRef(null);
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -41,10 +45,13 @@ export default function LoginFormik() {
     onSubmit: async (values) => {
       try {
         // Call backend login
+        loginButton.current.disabled = true; // Disable button to prevent multiple clicks
+        loginButton.current.innerText = "Logging in...";
+
         const response = await AuthService.login({
           email: values.email,
           password: values.password,
-          remember:values.remember
+          remember: values.remember
         });
 
         const token = response.data.token; // adjust if your backend returns { token, user }
@@ -56,12 +63,13 @@ export default function LoginFormik() {
           // Store in sessionStorage (deleted on browser close)
           sessionStorage.setItem("userData", token);
         }
-
-        // Optional: Store user info
-        // localStorage.setItem("user", JSON.stringify(response.data.user));
+        dispatch(setIsLoggedIn(true));
 
         navigate("/all-products");
       } catch (err) {
+        loginButton.current.disabled = false; // Re-enable button on error
+        loginButton.current.innerText = "Login";
+
         console.error("Login failed:", err);
         alert(
           err.response?.data?.message || "Login failed. Please check credentials."
@@ -70,12 +78,14 @@ export default function LoginFormik() {
     },
   });
 
+
   return (
     <Container component="main" maxWidth="xs">
       <Paper
         elevation={6}
         sx={{
           mt: 8,
+          mb: 2,
           p: 4,
           display: "flex",
           flexDirection: "column",
@@ -152,6 +162,7 @@ export default function LoginFormik() {
             type="submit"
             variant="contained"
             color="primary"
+            ref={loginButton}
             sx={{
               mt: 2,
               mb: 2,

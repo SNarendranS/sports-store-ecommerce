@@ -121,13 +121,28 @@ const getAllOfferProducts = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-export  {
+
+const availableStock = async (req, res) => {
+
+    try {
+        const { productid } = req.body;
+        const product = await Product.findByPk(productid);
+        if (!product) {
+            res.status(404).json({ message: 'Product not found' });
+        }
+        res.status(200).json({ available: product.availableStock });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+export {
     createProduct,
     getAllProducts,
     getProductById,
     updateProduct,
     deleteProduct,
     getAllOfferProducts,
-    getAllProductsCategories
-
+    getAllProductsCategories,
+    availableStock
 };

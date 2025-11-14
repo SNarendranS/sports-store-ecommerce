@@ -7,59 +7,63 @@ const EmailCard = ({ address, onEdit, onDelete }) => {
   if (!address) return null
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this address?')) {
-      try {
-        await UserAddressService.deleteAddress(address.addressid)
-        onDelete() // refresh parent data
-      } catch (error) {
-        console.error('Error deleting address:', error)
-      }
+    if (window.confirm('Delete this address?')) {
+      await UserAddressService.deleteAddress(address.addressid)
+      onDelete()
     }
   }
 
   return (
     <Grid item xs={12} sm={6}>
       <Paper
-        elevation={2}
+        elevation={4}
         sx={{
-          p: 2.5,
-          borderRadius: 2,
-          backgroundColor: (theme) =>
-            theme.palette.mode === 'dark' ? '#2b2b2b' : '#ffffff',
-          transition: '0.3s ease',
+          p: 3,
+          borderRadius: 3,
           position: 'relative',
-          '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 },
+          backdropFilter: 'blur(8px)',
+          transition: '0.3s',
+          background: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(50,50,50,0.45)'
+              : 'rgba(255,255,255,0.7)',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+          '&:hover': {
+            transform: 'translateY(-5px)',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+          }
         }}
       >
-        <Tooltip title="Edit Address">
+        {/* Edit button */}
+        <Tooltip title="Edit">
           <IconButton
             size="small"
-            color="primary"
-            sx={{ position: 'absolute', top: 8, right: 36 }}
+            sx={{ position: 'absolute', top: 10, right: 45, bgcolor: 'primary.light', color: '#fff' }}
             onClick={() => onEdit(address)}
           >
             <Edit fontSize="small" />
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Delete Address">
+        {/* Delete button */}
+        <Tooltip title="Delete">
           <IconButton
             size="small"
-            color="error"
-            sx={{ position: 'absolute', top: 8, right: 8 }}
+            sx={{ position: 'absolute', top: 10, right: 10, bgcolor: 'error.light', color: '#fff' }}
             onClick={handleDelete}
           >
             <Delete fontSize="small" />
           </IconButton>
         </Tooltip>
 
-        <Typography variant="subtitle1" fontWeight={600} color="primary" gutterBottom>
+        <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
           {address.tag || 'Address'}
         </Typography>
-        <Typography variant="body2">{address.addressLine1}</Typography>
-        {address.addressLine2 && <Typography variant="body2">{address.addressLine2}</Typography>}
-        {address.addressLine3 && <Typography variant="body2">{address.addressLine3}</Typography>}
-        <Typography variant="body2" color="text.secondary">
+
+        <Typography>{address.addressLine1}</Typography>
+        {address.addressLine2 && <Typography>{address.addressLine2}</Typography>}
+        {address.addressLine3 && <Typography>{address.addressLine3}</Typography>}
+        <Typography color="text.secondary" sx={{ mt: 1 }}>
           {address.city}, {address.state} - {address.pincode}
         </Typography>
       </Paper>

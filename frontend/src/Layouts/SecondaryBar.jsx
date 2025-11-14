@@ -16,10 +16,10 @@ import {
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSearchText } from '../../redux/searchSlice';
-import { setCategoryValue } from '../../redux/categorySlice';
-import cartService from '../../Services/cartService';
-import ProductService from '../../Services/productService';
+import { setSearchText } from '../redux/searchSlice';
+import { setCategoryValue } from '../redux/categorySlice';
+import cartService from '../Services/cartService';
+import ProductService from '../Services/productService';
 
 const SecondaryBar = () => {
     const [favItems, setFavItems] = useState([]);
@@ -30,7 +30,9 @@ const SecondaryBar = () => {
     const categoryValue = useSelector((state) => state.category.value);
     const navigate = useNavigate();
     const isMobile = useMediaQuery('(max-width:768px)');
+
     const [searchVisibility, setSearchVisibility] = useState(true);
+    const iconVisibility= (sessionStorage.getItem('userData') || localStorage.getItem('userData'));
 
     const fetchCart = async () => {
         const res = await cartService.getUserCart();
@@ -48,7 +50,11 @@ const SecondaryBar = () => {
         fetchCart();
         fetchCategories();
         fetchFavorites();
+
+        window.addEventListener('cartUpdated', fetchCart);
+        return () => window.removeEventListener('cartUpdated', fetchCart);
     }, []);
+
 
     const location = useLocation();
     useEffect(() => {
@@ -62,8 +68,7 @@ const SecondaryBar = () => {
     const quantityLength = () =>
         cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    return (
-        <AppBar
+    return ( <AppBar
             position="fixed"
             sx={{
                 top: 64, // below main AppBar
@@ -171,10 +176,10 @@ const SecondaryBar = () => {
                 )}
 
                 {/* Icons */}
-                <Box
+                {iconVisibility && <Box
                     sx={{
                         display: 'flex',
-                        justifyContent: isMobile ? 'flex-start' : 'flex-end',
+                        justifyContent: 'flex-end',
                         alignItems: 'center',
                         gap: 2,
                         width: isMobile ? '100%' : 'auto',
@@ -213,7 +218,7 @@ const SecondaryBar = () => {
                             <ShoppingCart />
                         </IconButton>
                     </Badge>
-                </Box>
+                </Box>}
             </Toolbar>
         </AppBar>
     );

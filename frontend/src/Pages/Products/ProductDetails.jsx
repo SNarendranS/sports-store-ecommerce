@@ -178,8 +178,13 @@ const ProductDetails = ({ product, handleClose }) => {
           </Typography>
           <Typography
             variant="body2"
-            fontWeight="medium"
-            color="text.secondary"
+            fontWeight="bold"
+            color={product.availableStock > 5 ? "text.secondary" : "error.main"}
+            sx={{
+              border: product.availableStock > 5 ? 'none' : '1.5px solid red',
+              width: 200,
+              justifySelf: 'center',
+            }}
           >
             Available Stock: {product.availableStock}
           </Typography>
@@ -213,6 +218,7 @@ const ProductDetails = ({ product, handleClose }) => {
           >
             ₹{discountedPrice}
           </Typography>
+
         </Box>
 
         {/* Action Buttons */}
