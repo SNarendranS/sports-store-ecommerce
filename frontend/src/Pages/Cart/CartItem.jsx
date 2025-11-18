@@ -24,7 +24,8 @@ const CartItem = ({ product, onRemoveFromList, reportTotal }) => {
         fetchProduct();
     }, [product, quantity]);
 
-    const handleQuantityChange = async (delta) => {
+    const handleQuantityChange = async (e,delta) => {
+        e.stopPropagation();
         const newQty = quantity + delta;
         if (newQty <= 0) return handleRemove();
 
@@ -41,7 +42,8 @@ const CartItem = ({ product, onRemoveFromList, reportTotal }) => {
         }
     };
 
-    const handleRemove = async () => {
+    const handleRemove = async (e) => {
+        e.stopPropagation();
         try {
             await removeProductFromCart(product);
         } catch (err) {
@@ -51,10 +53,11 @@ const CartItem = ({ product, onRemoveFromList, reportTotal }) => {
         onRemoveFromList(product.productid);
     };
 
-    const handleMoveToFav = async () => {
+    const handleMoveToFav = async (e) => {
+        e.stopPropagation();
         try {
             await addProductToFavorite(product);
-            handleRemove();
+            handleRemove(e);
         } catch (err) {
             console.error('Move to favorites failed:', err);
         }
@@ -65,7 +68,7 @@ const CartItem = ({ product, onRemoveFromList, reportTotal }) => {
     return (
         <>
         <Paper
-                    onClick={() => setOpenDetails(true)}
+                    onClick={(e) =>{e.stopPropagation(); setOpenDetails(true)}}
 
             elevation={3}
             sx={{
@@ -114,11 +117,11 @@ const CartItem = ({ product, onRemoveFromList, reportTotal }) => {
 
             {/* Quantity Controls */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: { xs: 1, sm: 0 } }}>
-                <IconButton size="small" onClick={() => handleQuantityChange(-1)} sx={{ border: '1px solid #ccc' }}>
+                <IconButton size="small" onClick={(e) => handleQuantityChange(e,-1)} sx={{ border: '1px solid #ccc' }}>
                     <Remove />
                 </IconButton>
                 <Typography fontWeight="bold" sx={{ minWidth: 20, textAlign: 'center' }}>{quantity}</Typography>
-                <IconButton size="small" onClick={() => handleQuantityChange(1)} sx={{ border: '1px solid #ccc' }}>
+                <IconButton size="small" onClick={(e) => handleQuantityChange(e,1)} sx={{ border: '1px solid #ccc' }}>
                     <Add />
                 </IconButton>
             </Box>

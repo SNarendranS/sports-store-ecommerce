@@ -21,7 +21,8 @@ const FavoriteItem = ({ product, onRemoveFromList }) => {
         fetchProduct();
     }, [product]);
 
-    const handleRemove = async () => {
+    const handleRemove = async (e) => {
+        e.stopPropagation();
         try {
             await removeProductFromFavorite(product);
         } catch (err) {
@@ -30,10 +31,11 @@ const FavoriteItem = ({ product, onRemoveFromList }) => {
         onRemoveFromList(product.productid);
     };
 
-    const handleMoveToCart = async () => {
+    const handleMoveToCart = async (e) => {
+        e.stopPropagation();
         try {
             await addProductToCart(product);
-            handleRemove();
+            handleRemove(e);
         } catch (err) {
             console.error('Move to cart failed:', err);
         }
