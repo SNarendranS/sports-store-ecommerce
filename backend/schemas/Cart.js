@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import {sequelize} from '../utils/database.js';
+import { sequelize } from '../utils/database.js';
 import User from './User.js';
 import Product from './Product.js';
 const Cart = sequelize.define('Cart', {
@@ -30,6 +30,10 @@ const Cart = sequelize.define('Cart', {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 1,
+    validate: {
+      max: 10,
+      min: 1
+    }
   },
 }, {
   tableName: 'carts',

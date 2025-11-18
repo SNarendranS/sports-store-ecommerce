@@ -28,6 +28,7 @@ const CartItem = ({ product, onRemoveFromList, reportTotal }) => {
         e.stopPropagation();
         const newQty = quantity + delta;
         if (newQty <= 0) return handleRemove();
+                if (newQty > 10) return alert('Maximum quantity reached (10)');
 
         try {
             const res = await cartService.updateCartItem(product.productid, newQty);
