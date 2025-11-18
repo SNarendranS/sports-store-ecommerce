@@ -13,24 +13,18 @@ function App() {
   const isMobile = useMediaQuery('(max-width:768px)');
 
   return (
-    <BrowserRouter>
-    <AppInitializer/>
-      {/* Top App Bar */}
-      <AppBarLayout />
+    <>
+      <AppInitializer />
+      <BrowserRouter>
+        <AppBarLayout />
+        <SecondaryBar />
+        <Container sx={{ mt: isMobile ? 24 : 20 }}>
+          <BodyLayout searchText={searchText} />
+        </Container>
+        <FooterLayout />
+      </BrowserRouter>
+    </>
 
-      {/* Secondary Bar (Products search / categories / icons) */}
-      <SecondaryBar />
-
-      {/* Main content */}
-      <Container sx={{ mt: isMobile ? 24 : 20 }}> 
-        {/* Adjust margin top so content isn't hidden under AppBars */}
-        <BodyLayout searchText={searchText} />
-      </Container>
-
-      {/* Footer */}
-      <FooterLayout />
-
-    </BrowserRouter>
   );
 }
 

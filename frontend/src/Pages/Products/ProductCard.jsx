@@ -14,7 +14,7 @@ import {
   Button,
   Tooltip,
 } from '@mui/material';
-import { AddShoppingCart, Favorite } from '@mui/icons-material';
+import { AddShoppingCart, Favorite, RemoveShoppingCart } from '@mui/icons-material';
 import ProductDetails from './ProductDetails';
 import useProductActions from '../../Hooks/useProductActions';
 import cartService from '../../Services/cartService';
@@ -22,7 +22,7 @@ import { calcDiscountedPrice } from '../../Utils/discountCalc';
 import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ cardData }) => {
-  const { isInCart, isFavorite, addProductToCart, addProductToFavorite, removeProductFromFavorite } = useProductActions();
+  const { isInCart, isFavorite, addProductToCart, removeProductFromCart, addProductToFavorite, removeProductFromFavorite } = useProductActions();
 
   const [openDetails, setOpenDetails] = useState(false);
   const [cartPopup, setCartPopup] = useState({ open: false, message: '' });
@@ -32,36 +32,6 @@ const ProductCard = ({ cardData }) => {
 
   const discountedPrice = calcDiscountedPrice(cardData.price, cardData.discount);
   const navigate = useNavigate();
-
-  const handleCartClick = async (e) => {
-    e.stopPropagation();
-    try {
-      const res = await cartService.FindItemInCart(cardData.productid);
-
-      if (res && res !== 404) {
-        // Item already in cart
-        setCartPopup({ open: true, message: 'Item is already in your cart.' });
-      } else {
-        // Add to cart
-        addProductToCart(cardData);
-        window.dispatchEvent(
-          new CustomEvent('cartToggled', { detail: cardData.productid })
-        );
-        setCartPopup({ open: true, message: 'Item added to cart successfully!' });
-      }
-    } catch (error) {
-      if (error.response?.status === 404) {
-        // Add to cart
-        addProductToCart(cardData);
-        window.dispatchEvent(
-          new CustomEvent('cartToggled', { detail: cardData.productid })
-        );
-        setCartPopup({ open: true, message: 'Item added to cart successfully!' });
-      } else {
-        console.error('Error fetching cart item:', error);
-      }
-    }
-  };
 
   const handleGoToCart = () => {
     setCartPopup({ ...cartPopup, open: false });
@@ -171,9 +141,6 @@ const ProductCard = ({ cardData }) => {
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.dispatchEvent(
-                    new CustomEvent('favToggled', { detail: cardData.productid })
-                  );
                   fav ? removeProductFromFavorite(cardData) : addProductToFavorite(cardData);
                 }}
               >
@@ -182,7 +149,7 @@ const ProductCard = ({ cardData }) => {
                     color: fav ? '#e53935' : '#b0b0b0',
                     fontSize: 26,
                     transition: '0.3s',
-                    '&:hover': { color: '#d32f2f' },
+                    // '&:hover': { color: fav?'#bababaff':'#f44bd5ff' },
                   }}
                 />
               </IconButton>
@@ -190,14 +157,19 @@ const ProductCard = ({ cardData }) => {
 
             <Tooltip title="Add to Cart">
               <IconButton
-                onClick={handleCartClick}
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  inCart ? removeProductFromCart(cardData) : addProductToCart(cardData);
+                }}
                 sx={{
                   color: '#1976d2',
                   transition: '0.3s',
                   '&:hover': { color: '#0d47a1', transform: 'scale(1.1)' },
                 }}
               >
-                <AddShoppingCart sx={{ fontSize: 26 }} />
+                {inCart ? <RemoveShoppingCart sx={{ fontSize: 26 }} /> :
+                  <AddShoppingCart sx={{ fontSize: 26 }} />}
               </IconButton>
             </Tooltip>
           </Grid>

@@ -28,18 +28,21 @@ const getUserFav = async (req, res) => {
   try {
     const { userid } = req.user;
 
-    const favItems = await Favorite.findAll({
-      where: { userid },
-      // Optionally include product details
-      // include: [{ model: Product, attributes: ['id', 'name', 'price', 'img'] }]
+    const result = await Favorite.findAndCountAll({
+      where: { userid }
     });
 
-    res.status(200).json(favItems);
+    res.status(200).json({
+      count: result.count,
+      items: result.rows
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
+
+
 
 // Remove item from favorites
 const removeFromFav = async (req, res) => {
@@ -78,4 +81,4 @@ const findItemFav = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-export { addToFav, getUserFav, removeFromFav ,findItemFav}
+export { addToFav, getUserFav, removeFromFav, findItemFav }

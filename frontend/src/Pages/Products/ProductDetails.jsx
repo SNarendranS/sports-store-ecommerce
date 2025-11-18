@@ -18,10 +18,9 @@ import {
   Divider,
   Paper,
 } from '@mui/material';
-import favService from '../../Services/favService';
 import useProductActions from '../../Hooks/useProductActions';
 
-const ProductDetails = ({ product, handleClose }) => {
+const ProductDetails = ({ product, handleClose,showButton=true }) => {
   const { addProductToCart, removeProductFromCart, isInCart, isFavorite, addProductToFavorite, removeProductFromFavorite } = useProductActions();
   const [loading, setLoading] = useState(false);
   const [inCart, setInCart] = useState(isInCart(product?.productid));
@@ -211,7 +210,7 @@ const ProductDetails = ({ product, handleClose }) => {
         </Box>
 
         {/* Action Buttons */}
-        <Grid container spacing={2} justifyContent="center">
+        {showButton&&<Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} sm={6}>
             <Button
               fullWidth
@@ -265,7 +264,7 @@ const ProductDetails = ({ product, handleClose }) => {
               {loading ? "Processing..." : inCart ? 'Remove from Cart' : 'Add to Cart'}
             </Button>
           </Grid>
-        </Grid>
+        </Grid>}
       </Container>
     </Paper>
   );
