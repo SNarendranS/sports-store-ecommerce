@@ -16,8 +16,12 @@ import {
 import { ArrowCircleRight, Delete, Favorite as FavoriteIcon } from '@mui/icons-material';
 import { getIsLoggedIn } from '../Utils/headerToken';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import useProductActions from '../Hooks/useProductActions';
 
 const Favorite = () => {
+    const dispatch = useDispatch();
+    const { addProductToCart,removeProductFromFavorite } = useProductActions();
     const [favoriteItems, setFavoriteItems] = useState([]);
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -55,20 +59,20 @@ const Favorite = () => {
         fetchProducts();
     }, [favoriteItems]);
 
-    const handleRemove = async (productid) => {
-        setFavoriteItems(prev => prev.filter(item => item.productid !== productid));
-        setProducts(prev => prev.filter(product => product.productid !== productid));
+    const handleRemove = async (product) => {
+        setFavoriteItems(prev => prev.filter(item => item.productid !== product.productid));
+        setProducts(prev => prev.filter(prod => prod.productid !== product.productid));
         try {
-            await favService.remove(productid);
+            await removeProductFromFavorite(product);
         } catch (error) {
             console.error('Failed to remove item:', error);
             fetchFavoriteItems();
         }
     };
 
-    const handleMoveToCart = async (productid) => {
-        const res = await cartService.addToCart(productid, 1);
-        if (res) handleRemove(productid);
+    const handleMoveToCart = async (product) => {
+        await addProductToCart(product);
+        handleRemove(product);
     };
 
     if (isLoading) {
@@ -187,7 +191,9 @@ const Favorite = () => {
                                         color="text.secondary"
                                         sx={{ mt: 0.5 }}
                                     >
-                                        ${product.price?.toFixed(2) || 'N/A'}
+                                        ₹
+                                        
+                                        {product.price?.toFixed(2) || 'N/A'}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -212,7 +218,7 @@ const Favorite = () => {
                                         background: 'linear-gradient(135deg, #42a5f5, #478ed1)',
                                         '&:hover': { background: 'linear-gradient(135deg, #1e88e5, #1565c0)' },
                                     }}
-                                    onClick={() => handleMoveToCart(product.productid)}
+                                    onClick={() => handleMoveToCart(product)}
                                 >
                                     Move to Cart
                                 </Button>
@@ -226,7 +232,7 @@ const Favorite = () => {
                                             transform: 'scale(1.2)',
                                         },
                                     }}
-                                    onClick={() => handleRemove(product.productid)}
+                                    onClick={() => handleRemove(product)}
                                 >
                                     <Delete />
                                 </IconButton>

@@ -9,16 +9,15 @@ import Favorite from '../Pages/Favorite'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import SnakeGame from '../Games/SnakeGame'
-import BasicLineChart from '../Pages/Charts/BasicLineChart'
 import ChartsPage from '../Pages/Charts/ChartsPage'
 
 const BodyLayout = ({ searchText }) => {
   const location = useLocation();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  
+
     const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
     setIsLoggedIn(!!userData);
   }, [location]);
@@ -32,7 +31,7 @@ const BodyLayout = ({ searchText }) => {
       <Route path='/cart' element={<Cart />} />
       <Route path='/favorite' element={<Favorite />} />
       <Route path='/profile' element={<Profile />} />
-      <Route path='/game' element={<SnakeGame/>} />
+      <Route path='/mini-game' element={<SnakeGame />} />
       <Route path='/chart' element={<ChartsPage />} />
     </Routes>
   )

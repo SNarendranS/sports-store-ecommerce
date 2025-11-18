@@ -4,36 +4,38 @@ import { Box, Button, CardMedia, IconButton, Paper, Stack, Typography } from "@m
 import { Add, ArrowCircleLeft, Delete, Remove } from "@mui/icons-material";
 import cartService from "../../Services/cartService";
 import favService from "../../Services/favService";
+import useProductActions from "../../Hooks/useProductActions";
 
-const CartItem = ({ productId, quantity: initialQty, onRemoveFromList, reportTotal }) => {
-    const [product, setProduct] = useState(null);
-    const [quantity, setQuantity] = useState(initialQty);
+const CartItem = ({ product, onRemoveFromList, reportTotal }) => {
+     const [ProductDetails, setProduct] = useState(null);
+    const [quantity, setQuantity] = useState(product.quantity || 1);
+    const { removeProductFromCart,addProductToFavorite } = useProductActions();
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const res = await ProductService.getProductById(productId);
+                const res = await ProductService.getProductById(product.productid);
                 setProduct(res.data);
-                reportTotal(productId, res.data.price * initialQty);
+                reportTotal(product.productid, res.data.price * quantity);
             } catch (err) {
                 console.error('Error fetching product:', err);
             }
         };
         fetchProduct();
-    }, [productId]);
-
+    }, [product]);
+    
     const handleQuantityChange = async (delta) => {
         const newQty = quantity + delta;
         if (newQty <= 0) return handleRemove();
 
         try {
-            const res = await cartService.updateCartItem(productId, newQty);
+            const res = await cartService.updateCartItem(product.productid, newQty);
             if (res.response?.status === 400) {
                 alert('Requested quantity not available in stock');
                 return;
             }
             setQuantity(newQty);
-            reportTotal(productId, newQty * product.price);
+            reportTotal(product.productid, newQty * ProductDetails.price);
         } catch (err) {
             console.error('Quantity update failed:', err);
         }
@@ -41,24 +43,25 @@ const CartItem = ({ productId, quantity: initialQty, onRemoveFromList, reportTot
 
     const handleRemove = async () => {
         try {
-            await cartService.removeFromCart(productId);
+            //await cartService.removeFromCart(productId);
+            await removeProductFromCart(product);
         } catch (err) {
             console.error('Remove failed:', err);
         }
-        reportTotal(productId, 0);
-        onRemoveFromList(productId);
+        reportTotal(product.productid, 0);
+        onRemoveFromList(product.productid);
     };
 
     const handleMoveToFav = async () => {
         try {
-            await favService.add(productId);
+            await addProductToFavorite(product);
             handleRemove();
         } catch (err) {
             console.error('Move to favorites failed:', err);
         }
     };
 
-    if (!product) return null;
+    if (!ProductDetails) return null;
 
     return (
         <Paper
@@ -102,10 +105,10 @@ const CartItem = ({ productId, quantity: initialQty, onRemoveFromList, reportTot
                         noWrap
                         sx={{ maxWidth: { xs: '70vw', sm: 180 } }}
                     >
-                        {product.name}
+                        {ProductDetails.name}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                        ₹{product.price?.toFixed(2)}
+                        ₹{ProductDetails.price?.toFixed(2)}
                     </Typography>
                 </Box>
             </Box>
@@ -137,7 +140,7 @@ const CartItem = ({ productId, quantity: initialQty, onRemoveFromList, reportTot
                 width={{ xs: '100%', sm: 'auto' }}
             >
                 <Typography fontWeight="bold" color="primary" sx={{ p: '0 4px' }}>
-                    ₹{(quantity * product.price).toFixed(2)}
+                    ₹{(quantity * ProductDetails.price).toFixed(2)}
                 </Typography>
 
                 <Button

@@ -17,7 +17,8 @@ import {
 import { SportsSoccer, Menu } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { setIsLoggedIn } from '../redux/loggedInSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import AuthService from '../Services/authService';
 
 export const AppBarLayout = () => {
   const navigate = useNavigate();
@@ -32,17 +33,28 @@ export const AppBarLayout = () => {
     setDrawerOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const res = await AuthService.logout();
+    if (res.status !== 200) {
+      console.error('Logout failed:', res.data || res.message);
+      return;
+    }
     localStorage.removeItem('userData');
     sessionStorage.removeItem('userData');
+    sessionStorage.removeItem('cartItems');
+    sessionStorage.removeItem('favoriteItems');
     dispatch(setIsLoggedIn(false));
     navigate('/');
   };
 
   const isLoggedIn =
+    // useSelector((state) => state.login.isLoggedIn)
+
     localStorage.getItem('userData') || sessionStorage.getItem('userData');
 
-  const menu = ['All Products', 'Offers', 'Profile', 'Mini Game'];
+  const menu =   ['All Products', 'Offers', 'Profile'];
+
+  // ['All Products', 'Offers', 'Profile', 'Mini Game'];
 
   const menuItems = isLoggedIn
     ? menu                      // logged in → show all
@@ -235,7 +247,7 @@ export const AppBarLayout = () => {
           {/* Login / Logout */}
           <ListItem
             button
-            onClick={isLoggedIn ? handleLogout : () => handleNavigate('login')}
+            onClick={isLoggedIn ? handleLogout : () => handleNavigate('')}
             sx={{
               borderRadius: 2,
               cursor: 'pointer',

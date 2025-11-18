@@ -37,6 +37,15 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 'user',
   },
+  logged_in: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
+  token: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 }, {
   tableName: 'users',
   timestamps: true,

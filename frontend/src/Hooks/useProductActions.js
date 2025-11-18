@@ -1,85 +1,71 @@
-// hooks/useProductActions.js
-import { useState, useEffect } from 'react';
 import cartService from '../Services/cartService';
 import FavoriteService from '../Services/favService';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, removeFromCart } from '../redux/cartSlice';
+import { addToFavorite, removeFromFavorite } from '../redux/favoriteSlice';
 const useProductActions = () => {
-    const [cartItems, setCartItems] = useState([]);
-    const [favItems, setFavItems] = useState([]);
-    const getUserCart = async () => {
-        try {
-            const res = await cartService.getUserCart();
-            if (res) {
-                const productIds = res.map((item) => item.productid);
-                setCartItems(productIds);
-            }
-        } catch (error) {
-            console.error('Error fetching cart:', error);
-        }
-    };
-    const getUserFav = async () => {
-        try {
-            const res = await FavoriteService.getUserFav(); 
-            if (res) {
-                const productIds = res.map((item) => item.productid);
-                setFavItems(productIds);
-            }
-        } catch (error) {
-            console.error('Error fetching favorites:', error);
-        }
-    };
-    useEffect(() => {
+    const dispatch = useDispatch();
 
-        getUserCart();
-        getUserFav();
-    }, []);
+    const cartItems = useSelector((state) => state.cart.items);
+    const favItems = useSelector((state) => state.favorite.items);
+
 
 
     // ✅ Check if item exists
     const isInCart = (productId) => {
-        return cartItems.includes(productId);
-    }
+        return cartItems?.some(item => item.productid === productId);
+    };
+
     const isFavorite = (productId) => {
-        return favItems.includes(productId);
+        return favItems?.some(item => item.productid === productId);
+
     }
     // ✅ Toggle Cart
-    const toggleCart = async (productId) => {
+    const removeProductFromCart = async (product) => {
         try {
-            if (isInCart(productId)) {
-                await cartService.removeFromCart(productId);
-                setCartItems((prev) => prev.filter((id) => id !== productId));
-            } else {
-                await cartService.addToCart(productId, 1);
-                setCartItems((prev) => [...prev, productId]);
-            }
+            await cartService.removeFromCart(product.productid);
+            dispatch(removeFromCart(product));
+
         } catch (error) {
             console.error('Error updating cart:', error);
         }
     };
-
-    // ✅ Toggle Favorite
-    const toggleFavorite = async (productId) => {
+    const addProductToCart = async (product) => {
         try {
-            if (isFavorite(productId)) {
-                await FavoriteService.remove(productId);
-                setFavItems((prev) => prev.filter((id) => id !== productId));
-            } else {
-                await FavoriteService.add(productId);
-                setFavItems((prev) => [...prev, productId]);
-            }
+            await cartService.addToCart(product.productid, 1);
+            dispatch(addToCart(product));
+
+        } catch (error) {
+            console.error('Error updating cart:', error);
+        }
+    };
+    const addProductToFavorite = async (product) => {
+        try {
+            await FavoriteService.add(product.productid);
+            dispatch(addToFavorite(product));
+
+
         } catch (error) {
             console.error('Error updating favorites:', error);
         }
 
     };
+    const removeProductFromFavorite = async (product) => {
+        try {
+            await FavoriteService.remove(product.productid);
+            dispatch(removeFromFavorite(product));
 
+        } catch (error) {
+            console.error('Error updating favorites:', error);
+        }
+
+    };
     // ✅ Fetch Cart from backend
     const fetchCart = async () => {
         try {
             const res = await cartService.getUserCart();
             if (res?.data) {
                 const productIds = res.data.map((item) => item.productid);
-                setCartItems(productIds);
                 localStorage.setItem('cartItems', JSON.stringify(productIds));
             }
         } catch (error) {
@@ -91,7 +77,6 @@ const useProductActions = () => {
     const removeFromCartCompletely = async (productId) => {
         try {
             await cartService.removeFromCart(productId);
-            setCartItems((prev) => prev.filter((id) => id !== productId));
         } catch (err) {
             console.error('Error removing from cart:', err);
         }
@@ -100,8 +85,10 @@ const useProductActions = () => {
     return {
         isInCart,
         isFavorite,
-        toggleCart,
-        toggleFavorite,
+        addProductToCart,
+        removeProductFromCart,
+        addProductToFavorite,
+        removeProductFromFavorite,
         fetchCart,
         removeFromCartCompletely,
 

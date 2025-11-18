@@ -27,19 +27,19 @@ export const addToCart = async (req, res) => {
 };
 
 // Get all items in a user's cart
+
 export const getUserCart = async (req, res) => {
   try {
     const { userid } = req.user;
-
-    const cartItems = await Cart.findAll({
+   
+    const result = await Cart.findAndCountAll({
       where: { userid }
-      // ,
-      // include: [
-      //   { model: Product, attributes: ['id', 'name', 'price', 'img'] }
-      // ]
     });
 
-    res.status(200).json(cartItems);
+    res.status(200).json({
+      count: result.count,
+      items: result.rows
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error', error });

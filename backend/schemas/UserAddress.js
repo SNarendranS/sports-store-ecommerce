@@ -13,7 +13,8 @@ const UserAddress = sequelize.define('UserAddress', {
     allowNull: false,
     references: {
       model: User,
-      key: 'userid',
+      
+      
     },
     onDelete: 'CASCADE',
   },
@@ -49,7 +50,7 @@ const UserAddress = sequelize.define('UserAddress', {
     },
   },
 }, {
-  tableName: 'userAddress',
+  tableName: 'user_address',
   timestamps: true,
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   AddShoppingCart,
   Favorite,
@@ -18,64 +18,53 @@ import {
   Divider,
   Paper,
 } from '@mui/material';
-import cartService from '../../Services/cartService';
 import favService from '../../Services/favService';
+import useProductActions from '../../Hooks/useProductActions';
 
 const ProductDetails = ({ product, handleClose }) => {
-  const [inCart, setInCart] = useState(false);
-  const [fav, setFav] = useState(false);
-
+  const { addProductToCart, removeProductFromCart, isInCart, isFavorite, addProductToFavorite, removeProductFromFavorite } = useProductActions();
+  const [loading, setLoading] = useState(false);
+  const [inCart, setInCart] = useState(isInCart(product?.productid));
+  const [fav, setFav] = useState(isFavorite(product?.productid));
   const toggleCart = async () => {
     if (!product?.productid) return;
+
     try {
-      if (inCart) {
-        await cartService.removeFromCart(product.productid);
+      setLoading(true);
+      if (!inCart) {
+        await addProductToCart(product);
+        setInCart(true);
       } else {
-        await cartService.addToCart(product.productid, 1);
+        await removeProductFromCart(product);
+        setInCart(false);
       }
-      setInCart((prev) => !prev);
+
     } catch (error) {
-      console.error('Error updating cart:', error);
+      console.error("Error updating cart:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const toggleFavorite = async () => {
     if (!product?.productid) return;
+
     try {
-      if (fav) {
-        await favService.remove(product.productid);
+      setLoading(true);
+      if (!fav) {
+        await addProductToFavorite(product);
+        setFav(true);
       } else {
-        await favService.add(product.productid);
-      }
-      setFav((prev) => !prev);
-    } catch (error) {
-      console.error('Error updating fav:', error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchCartItem = async () => {
-      try {
-        const res = await cartService.FindItemInCart(product.productid);
-        if (res) setInCart(true);
-      } catch {
-        setInCart(false);
-      }
-    };
-    if (product) fetchCartItem();
-  }, [product]);
-
-  useEffect(() => {
-    const fetchFavItem = async () => {
-      try {
-        const res = await favService.FindItem(product.productid);
-        if (res) setFav(true);
-      } catch {
+        await removeProductFromFavorite(product);
         setFav(false);
       }
-    };
-    if (product) fetchFavItem();
-  }, [product]);
+
+    } catch (error) {
+      console.error("Error updating favorite:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!product)
     return (
@@ -254,6 +243,8 @@ const ProductDetails = ({ product, handleClose }) => {
               color={inCart ? 'error' : 'primary'}
               startIcon={inCart ? <Delete /> : <AddShoppingCart />}
               onClick={toggleCart}
+              disabled={loading}   // ← THIS IS THE IMPORTANT PART
+
               sx={{
                 textTransform: 'none',
                 fontWeight: 'bold',
@@ -271,7 +262,7 @@ const ProductDetails = ({ product, handleClose }) => {
                 },
               }}
             >
-              {inCart ? 'Remove from Cart' : 'Add to Cart'}
+              {loading ? "Processing..." : inCart ? 'Remove from Cart' : 'Add to Cart'}
             </Button>
           </Grid>
         </Grid>

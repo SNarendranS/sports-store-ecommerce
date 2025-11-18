@@ -6,6 +6,7 @@ import FooterLayout from "./Layouts/FooterLayout";
 import { useState } from "react";
 import SecondaryBar from "./Layouts/SecondaryBar";
 import { Container, useMediaQuery } from "@mui/material";
+import AppInitializer from "./Utils/AppInitializer";
 
 function App() {
   const [searchText, SetSearchText] = useState('');
@@ -13,6 +14,7 @@ function App() {
 
   return (
     <BrowserRouter>
+    <AppInitializer/>
       {/* Top App Bar */}
       <AppBarLayout />
 

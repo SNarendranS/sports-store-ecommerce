@@ -22,10 +22,11 @@ import { calcDiscountedPrice } from '../../Utils/discountCalc';
 import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ cardData }) => {
+  const { isInCart, isFavorite, addProductToCart, addProductToFavorite, removeProductFromFavorite } = useProductActions();
+
   const [openDetails, setOpenDetails] = useState(false);
   const [cartPopup, setCartPopup] = useState({ open: false, message: '' });
 
-  const { isInCart, isFavorite, toggleCart, toggleFavorite } = useProductActions();
   const inCart = isInCart(cardData.productid);
   const fav = isFavorite(cardData.productid);
 
@@ -42,7 +43,7 @@ const ProductCard = ({ cardData }) => {
         setCartPopup({ open: true, message: 'Item is already in your cart.' });
       } else {
         // Add to cart
-        toggleCart(cardData.productid);
+        addProductToCart(cardData);
         window.dispatchEvent(
           new CustomEvent('cartToggled', { detail: cardData.productid })
         );
@@ -51,7 +52,7 @@ const ProductCard = ({ cardData }) => {
     } catch (error) {
       if (error.response?.status === 404) {
         // Add to cart
-        toggleCart(cardData.productid);
+        addProductToCart(cardData);
         window.dispatchEvent(
           new CustomEvent('cartToggled', { detail: cardData.productid })
         );
@@ -173,7 +174,7 @@ const ProductCard = ({ cardData }) => {
                   window.dispatchEvent(
                     new CustomEvent('favToggled', { detail: cardData.productid })
                   );
-                  toggleFavorite(cardData.productid);
+                  fav ? removeProductFromFavorite(cardData) : addProductToFavorite(cardData);
                 }}
               >
                 <Favorite

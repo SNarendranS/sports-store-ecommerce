@@ -16,7 +16,7 @@ const Cart = () => {
         try {
             setIsLoading(true);
             const res = await cartService.getUserCart();
-            setCartItems(res || []);
+            setCartItems(res?.items || []);
         } catch (err) {
             console.error('Error fetching cart:', err);
         } finally {
@@ -98,8 +98,7 @@ const Cart = () => {
                         {cartItems.map((item) => (
                             <CartItem
                                 key={item.productid}
-                                productId={item.productid}
-                                quantity={item.quantity}
+                                product={item}
                                 onRemoveFromList={handleRemoveFromList}
                                 reportTotal={updateItemTotal} // new prop for reporting total
                             />

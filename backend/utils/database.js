@@ -14,7 +14,7 @@ const database = async () => {
     console.log('✅ PostgreSQL connected successfully');
 
     // Sync models with DB
-    //await sequelize.sync({ alter: true }); 
+    await sequelize.sync({ alter: true }); 
 
   } catch (err) {
     console.error('❌ PostgreSQL connection error:', err.message);

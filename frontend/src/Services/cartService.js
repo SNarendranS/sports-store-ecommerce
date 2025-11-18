@@ -5,7 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URI + '/cart';
 
 const addToCart = async (productid, quantity = 1) => {
   try {
-    console.log("header", getAuthHeaders())
+
     const response = await axios.post(`${API_BASE_URL}`, { productid, quantity }, { headers: getAuthHeaders() });
     return response.data;
   } catch (error) {
