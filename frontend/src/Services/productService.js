@@ -13,8 +13,8 @@ const getAuthConfig = () => {
 };
 
 // Product API calls
-const getAllProducts = () => axios.get(`${API_URI}`);
-const getAllOfferProducts = () => axios.get(`${API_URI}/offers`);
+const getAllProducts = (offset, limit) => axios.get(`${API_URI}?offset=${offset}&limit=${limit}`);
+const getAllOfferProducts = (offset, limit) => axios.get(`${API_URI}/offers?offset=${offset}&limit=${limit}`);
 const getAllProductsCategories = () => axios.get(`${API_URI}/category`);
 
 const getProductById = (id) => axios.get(`${API_URI}/${id}`);

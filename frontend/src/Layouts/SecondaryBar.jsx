@@ -34,8 +34,6 @@ const SecondaryBar = () => {
 
     const cartItems = useSelector((state) => state.cart.items);
     const favItems = useSelector((state) => state.favorite.items);
-    console.log("Cart items in SecondaryBar:", cartItems);
-    console.log("Favorite items in SecondaryBar:", favItems);
     const fetchCategories = async () => {
         const res = await ProductService.getAllProductsCategories();
         if (Array.isArray(res?.data)) setCategories(['All', ...res.data]);

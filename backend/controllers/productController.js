@@ -23,16 +23,74 @@ const createProduct = async (req, res) => {
     }
 };
 
+// const getAllProducts = async (req, res) => {
+//     try {
+//         // const products = await Product.findAll(); 
+//         const offset = parseInt(req.query.offset) || 0;
+//         const limit = parseInt(req.query.limit) || 10000;
+
+//         const products = await Product.findAll({
+//             offset: parseInt(offset),
+//             limit: parseInt(limit)
+//         });
+//         res.status(200).json(products);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// };
+// const getAllOfferProducts = async (req, res) => {
+//     try {
+//         const offset = parseInt(req.query.offset) || 0;
+//         const limit = parseInt(req.query.limit) || 10000;
+
+
+//         const products = await Product.findAll({
+//             where: { discount: { [Op.gt]: 0 } },
+//             offset: parseInt(offset),
+//             limit: parseInt(limit)
+//         });
+//         res.status(200).json(products);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// };
+
 const getAllProducts = async (req, res) => {
-    try {
-        const products = await Product.findAll();
-        res.status(200).json(products);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
+  try {
+    const offset = parseInt(req.query.offset) || 0;
+    const limit = parseInt(req.query.limit) || 10000;
+
+    const { rows: products, count: totalCount } = await Product.findAndCountAll({
+      offset,
+      limit,
+    });
+
+    res.status(200).json({ products, totalCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
+const getAllOfferProducts = async (req, res) => {
+  try {
+    const offset = parseInt(req.query.offset) || 0;
+    const limit = parseInt(req.query.limit) || 10000;
+
+    const { rows: products, count: totalCount } = await Product.findAndCountAll({
+      where: { discount: { [Op.gt]: 0 } },
+      offset,
+      limit,
+    });
+
+    res.status(200).json({ products, totalCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 
 const getAllProductsCategories = async (req, res) => {
     try {
@@ -112,15 +170,7 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-const getAllOfferProducts = async (req, res) => {
-    try {
-        const products = await Product.findAll({ where: { discount: { [Op.gt]: 0 } } });
-        res.status(200).json(products);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
+
 
 const availableStock = async (req, res) => {
 
@@ -144,5 +194,5 @@ export {
     deleteProduct,
     getAllOfferProducts,
     getAllProductsCategories,
-    availableStock
+    availableStock,
 };

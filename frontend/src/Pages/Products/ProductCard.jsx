@@ -25,22 +25,13 @@ const ProductCard = ({ cardData }) => {
   const { isInCart, isFavorite, addProductToCart, removeProductFromCart, addProductToFavorite, removeProductFromFavorite } = useProductActions();
 
   const [openDetails, setOpenDetails] = useState(false);
-  const [cartPopup, setCartPopup] = useState({ open: false, message: '' });
 
   const inCart = isInCart(cardData.productid);
   const fav = isFavorite(cardData.productid);
 
   const discountedPrice = calcDiscountedPrice(cardData.price, cardData.discount);
-  const navigate = useNavigate();
 
-  const handleGoToCart = () => {
-    setCartPopup({ ...cartPopup, open: false });
-    navigate('/cart');
-  };
 
-  const handleContinueShopping = () => {
-    setCartPopup({ ...cartPopup, open: false });
-  };
 
   return (
     <>
@@ -49,6 +40,7 @@ const ProductCard = ({ cardData }) => {
         sx={{
           width: 270,
           borderRadius: 4,
+          background: cardData.discount>0?'#fff':'#ffffff',
           overflow: 'hidden',
           boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
           transition: 'transform 0.25s ease, box-shadow 0.3s ease',
@@ -155,7 +147,7 @@ const ProductCard = ({ cardData }) => {
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Add to Cart">
+            <Tooltip title={inCart ? "Remove from Cart" : "Add to Cart"}>
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
@@ -183,27 +175,6 @@ const ProductCard = ({ cardData }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Unified Cart Action Popup */}
-      <Dialog
-        open={cartPopup.open}
-        onClose={handleContinueShopping}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogContent>
-          <Typography variant="h6" fontWeight="bold" textAlign="center">
-            {cartPopup.message}
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleGoToCart}>
-            Go to Cart
-          </Button>
-          <Button variant="outlined" onClick={handleContinueShopping}>
-            Continue Shopping
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };
