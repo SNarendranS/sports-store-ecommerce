@@ -4,14 +4,23 @@ const storedUser =
   localStorage.getItem("userData") || sessionStorage.getItem("userData");
 
 const loggedInSlice = createSlice({
-  name: 'isLoggedIn',
-  initialState: { value: !!storedUser },   // convert to boolean
+  name: 'userToken',
+  initialState: { value: storedUser },
   reducers: {
-    setIsLoggedIn: (state, action) => {
+    setToken: (state, action) => {
       state.value = action.payload;
+    },
+    getToken: (state) => {
+      return state.value;
+    },
+    removeToken: (state) => {
+      state.value = null;
+    },
+    isLoggedIn: (state) => {
+      return state.value !== null;
     }
   }
 });
 
-export const { setIsLoggedIn } = loggedInSlice.actions;
+export const { setToken, getToken,removeToken, isLoggedIn } = loggedInSlice.actions;
 export default loggedInSlice.reducer;

@@ -5,11 +5,20 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store.js'
 
 const theme = createTheme({
+  palette: {
+    cart: {
+      main: '#1976d2', // your custom color
+    },
+     favorite: {
+      main: '#ff4081', // your custom color
+    },
+  },
   components: {
     MuiContainer: {
       styleOverrides: {
         root: {
           color: '#554a4aff',
+          favorite:'#1976d2'
         },
       },
     },

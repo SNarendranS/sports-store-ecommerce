@@ -93,9 +93,9 @@ const ProductDetails = ({ product, handleClose,showButton=true }) => {
           position: 'absolute',
           top: 10,
           right: 10,
-          color: 'grey.600',
+          color: '#fff',
           zIndex: 5,
-          '&:hover': { color: 'error.main', transform: 'rotate(90deg)' },
+          '&:hover': { color: '#000', transform: 'rotate(90deg)' },
           transition: '0.3s ease',
         }}
       >
