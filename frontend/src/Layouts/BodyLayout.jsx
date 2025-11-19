@@ -8,7 +8,6 @@ import Profile from '../Pages/Profile/Profile'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import SnakeGame from '../Games/SnakeGame'
-import ChartsPage from '../Pages/Charts/ChartsPage'
 import FavoritePage from '../Pages/Favorite/FavoritePage'
 
 const BodyLayout = ({ searchText }) => {
@@ -32,8 +31,6 @@ const BodyLayout = ({ searchText }) => {
       <Route path='/favorite' element={<FavoritePage/>} />
       <Route path='/profile' element={<Profile />} />
       <Route path='/mini-game' element={<SnakeGame />} />
-      <Route path='/chart' element={<ChartsPage />} />
-
     </Routes>
   )
 }
